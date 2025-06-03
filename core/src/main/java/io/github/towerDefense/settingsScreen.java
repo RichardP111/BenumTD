@@ -1,7 +1,7 @@
 /**
  * @author Sahil Sahu & Richard Pu
  * Last modified: 2025-05-28
- * This file the start menu screen of Rise of Benum Tower Defense.
+ * This file the Settings menu screen of Rise of Benum Tower Defense.
  */
 
 package io.github.towerDefense;
@@ -22,21 +22,23 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import io.github.towerDefense.map.classMap;
-
 
 public class settingsScreen implements Screen { 
     private final Main game;
     private SpriteBatch batch;
     private Texture backgroundImage;
-    private Texture logoImage;
-    private Texture settingsImage;
+    private Texture effectImage;
+    private Texture musicImage;
+    
 
     private Stage stage;
     private Skin skin;
 
     private Sound mainSound;
     private long mainID;
+
+    public static boolean effectEnabled = true; 
+    public static boolean musicEnabled = true; 
 
     public settingsScreen(Main game) {
         this.game = game;
@@ -46,11 +48,7 @@ public class settingsScreen implements Screen {
     public void show() {
         batch = new SpriteBatch();
         backgroundImage = new Texture("startBackground.png");
-
-        // Start music
         mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
-        mainID = mainSound.play(1.0f);
-        mainSound.setLooping(mainID, true);
 
         // Stage and input
         stage = new Stage(new ScreenViewport());
@@ -69,41 +67,55 @@ public class settingsScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mainSound.stop();
-                game.setScreen(new classMap(game));
+                game.setScreen(new startScreen(game));
             }
         });
 
-        TextButton tutorialButton = new TextButton("Tutorial", skin);
-        tutorialButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                mainSound.stop();
-                game.setScreen(new Tutorial(game));
-            }
-        });
-
-        table.add().height(300); // Spacer
+        table.add().height(600); // Spacer
         table.row();
         table.add(startButton).width(200).height(50).pad(10);
-        table.row();
-        table.add(tutorialButton).width(200).height(50).pad(10);
-
         stage.addActor(table);
 
-        // Settings button (top right)
-        ImageButton settingsButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(settingsImage)));
-        settingsButton.addListener(new ClickListener() {
+        // Effects Button
+        effectImage = new Texture("effectsButton.png");
+        ImageButton effectButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(effectImage)));
+        effectButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                mainSound.stop();
-                game.setScreen(new settingsScreen(game));
+                effectEnabled = !effectEnabled; // Toggle effect state
+                if (effectEnabled) {
+                    Gdx.app.log("Settings", "Effects Enabled");
+                } else {
+                    Gdx.app.log("Settings", "Effects Disabled");
+                }
+            }
+        });
+
+        // Music Button
+        musicImage = new Texture("musicButton.png");
+        ImageButton musicButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(musicImage)));
+        musicButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                musicEnabled = !musicEnabled; // Toggle music state
+                if (musicEnabled) {
+                    mainID = mainSound.play(1.0f);
+                    mainSound.setLooping(mainID, true);
+                    Gdx.app.log("Settings", "Music Enabled");
+                } else {
+                    if (mainSound != null) {
+                        mainSound.stop(mainID);
+                    }
+                    Gdx.app.log("Settings", "Music Disabled");
+                }
             }
         });
 
         Table settingsTable = new Table();
         settingsTable.setFillParent(true);
-        settingsTable.top().right().pad(20);
-        settingsTable.add(settingsButton).size(70); // Adjust size as needed
+        settingsTable.center();
+        settingsTable.add(musicButton).size(120); // Adjust size as needed
+        settingsTable.add(effectButton).size(120).pad(10); // Adjust size as needed
         stage.addActor(settingsTable);
     }
 
@@ -116,12 +128,8 @@ public class settingsScreen implements Screen {
         int screenWidth = Gdx.graphics.getWidth();
         int screenHeight = Gdx.graphics.getHeight();
 
-        float logoX = (screenWidth - logoImage.getWidth()) / 2f;
-        float logoY = screenHeight - logoImage.getHeight() - 30;
-
         batch.begin();
         batch.draw(backgroundImage, 0, 0, screenWidth, screenHeight);
-        batch.draw(logoImage, logoX, logoY);
         batch.end();
 
         stage.act(delta);
@@ -132,8 +140,8 @@ public class settingsScreen implements Screen {
     public void dispose() {
         batch.dispose();
         backgroundImage.dispose();
-        logoImage.dispose();
-        settingsImage.dispose();
+        musicImage.dispose();
+        effectImage.dispose();
         stage.dispose();
         skin.dispose();
         mainSound.dispose();
@@ -146,3 +154,4 @@ public class settingsScreen implements Screen {
     @Override public void resume() {}
     @Override public void hide() {}
 }
+
