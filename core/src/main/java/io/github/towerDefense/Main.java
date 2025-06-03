@@ -7,12 +7,10 @@
 package io.github.towerDefense;
 
 import com.badlogic.gdx.Game;
-import io.github.towerDefense.map.jungleMap; // Import jungleMap
 
 public class Main extends Game {
     @Override
     public void create() {
-        // Set the screen to jungleMap directly for testing the integrated logic
-        this.setScreen(new jungleMap(this));
+        this.setScreen(new splashScreen(this));
     }
 }

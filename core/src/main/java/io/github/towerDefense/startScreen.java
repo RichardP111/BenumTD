@@ -51,8 +51,10 @@ public class startScreen implements Screen {
 
         // Start music
         mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
-        mainID = mainSound.play(1.0f);
-        mainSound.setLooping(mainID, true);
+        if (settingsScreen.musicEnabled) {
+            mainID = mainSound.play(1.0f);
+            mainSound.setLooping(mainID, true);
+        }
 
         // Stage and input
         stage = new Stage(new ScreenViewport());
@@ -97,7 +99,6 @@ public class startScreen implements Screen {
         settingsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                mainSound.stop();
                 game.setScreen(new settingsScreen(game));
             }
         });

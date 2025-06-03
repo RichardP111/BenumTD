@@ -14,19 +14,18 @@ import java.util.Iterator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.GL20; // Added GL20 for glClear
 
 import io.github.towerDefense.Enemy;
 import io.github.towerDefense.Main;
-import io.github.towerDefense.Towers;
 import io.github.towerDefense.TowerPlacementManager;
+import io.github.towerDefense.Towers;
 
 public class jungleMap implements Screen {
     private final Main game;
@@ -62,9 +61,9 @@ public class jungleMap implements Screen {
     public void show() {
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
-        backgroundImage = new Texture("C:\\Users\\sahil\\Documents\\Highschool\\Grade 11\\Computer Science\\Benum'sTD part2\\BenumTD\\assets\\maps\\jungleMap.jpg"); // Ensure this path is correct
-        enemies = new ArrayList<>();
+        backgroundImage = new Texture("maps/jungleMap.jpg"); 
         towers = new ArrayList<>();
+        enemies = new ArrayList<>();
 
         // Initialize camera for tower placement
         camera = new OrthographicCamera();
@@ -81,18 +80,14 @@ public class jungleMap implements Screen {
         enemySpawnIntervalInWave = 1.0f; // Time between individual enemy spawns
         individualEnemySpawnTimer = 0f;
 
-        font = new BitmapFont(); // Initialize BitmapFont
-        glyphLayout = new GlyphLayout(); // Initialize GlyphLayout
+        font = new BitmapFont(); 
+        glyphLayout = new GlyphLayout(); 
     }
 
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();
         int screenHeight = Gdx.graphics.getHeight();
-
-        // Clear the screen
-        Gdx.gl.glClearColor(0.2f, 0.2f, 0.25f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Update camera
         camera.update();
@@ -107,18 +102,11 @@ public class jungleMap implements Screen {
         glyphLayout.setText(font, waveText);
 
         float textX = (screenWidth - glyphLayout.width) / 2;
-        float textY = screenHeight - 50; // Adjust Y position as needed
+        float textY = screenHeight - 50; // Position text near the top center
 
-        // Draw black outline for text
-        font.setColor(Color.BLACK);
-        font.draw(batch, waveText, textX - 1, textY - 1);
-        font.draw(batch, waveText, textX + 1, textY - 1);
-        font.draw(batch, waveText, textX - 1, textY + 1);
-        font.draw(batch, waveText, textX + 1, textY + 1);
-        // Draw white text on top
         font.setColor(Color.WHITE);
         font.draw(batch, waveText, textX, textY);
-        batch.end(); // End SpriteBatch here
+        batch.end();
 
         // Handle tower placement (logic only)
         Towers newTower = placementManager.getNewTowerOnLeftClick(delta);
@@ -207,7 +195,7 @@ public class jungleMap implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.setToOrtho(false, width, height); // Update camera on resize
+        camera.setToOrtho(false, width, height);
         enemyPath.addWaypoint(width * 1.00f, height * 0.87f);
         enemyPath.addWaypoint(width * 0.82f, height * 0.87f);
         enemyPath.addWaypoint(width * 0.82f, height * 0.66f);
@@ -261,26 +249,15 @@ public class jungleMap implements Screen {
         enemyPath.addWaypoint(width * 0.00f, height * 0.20f);
     }
 
-    @Override
-    public void pause() {
-        // Handle pause logic if needed
-    }
-
-    @Override
-    public void resume() {
-        // Handle resume logic if needed
-    }
-
-    @Override
-    public void hide() {
-        // Handle hide logic if needed
-    }
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void hide() {}
 
     @Override
     public void dispose() {
         if (batch != null) batch.dispose();
         if (shapeRenderer != null) shapeRenderer.dispose();
         if (backgroundImage != null) backgroundImage.dispose();
-        if (font != null) font.dispose(); // Dispose of font
+        if (font != null) font.dispose(); 
     }
 }
