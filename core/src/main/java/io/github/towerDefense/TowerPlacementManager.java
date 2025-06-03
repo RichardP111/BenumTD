@@ -50,10 +50,34 @@ public class TowerPlacementManager {
             // For now, place a simple tower at the clicked location
             // You can add more complex logic here, like checking for valid placement spots
             // or selecting tower types from a UI.
-            Towers newTower = new Towers(worldCoordinates.x, worldCoordinates.y, 150f, 1f, 1.5f, Color.BLUE);
-            timeSinceLastPlacement = 0f; // Reset cooldown
-            return newTower;
+            
+            // Check for overlapping before placing the tower
+            if (!isOverlapping(worldCoordinates.x - Towers.SIZE / 2f, worldCoordinates.y - Towers.SIZE / 2f)) {
+                Towers newTower = new Towers(worldCoordinates.x, worldCoordinates.y, 150f, 1f, 1.5f, Color.BLUE);
+                timeSinceLastPlacement = 0f; // Reset cooldown
+                return newTower;
+            } else {
+                System.out.println("Cannot place tower: Overlapping with an existing tower.");
+            }
         }
         return null;
+    }
+
+    /**
+     * Checks if a potential new tower position overlaps with any existing towers.
+     * @param newX The x-coordinate of the proposed new tower.
+     * @param newY The y-coordinate of the proposed new tower.
+     * @return true if an overlap is detected, false otherwise.
+     */
+    private boolean isOverlapping(float newX, float newY) {
+        for (Towers tower : towers) {
+            // Check if the new tower overlaps with any existing tower
+            // Simplified AABB collision check
+            if (newX < tower.x + Towers.SIZE && newX + Towers.SIZE > tower.x &&
+                newY < tower.y + Towers.SIZE && newY + Towers.SIZE > tower.y) {
+                return true; // Overlap detected
+            }
+        }
+        return false; // No overlap
     }
 }
