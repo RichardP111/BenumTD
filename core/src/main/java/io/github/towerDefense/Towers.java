@@ -1,68 +1,95 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-05-27
+ * Last modified: 2025-06-02
  * This file is part of Rise of Benum Tower Defense.
- * Creates the visual tower.
+ * Defines the properties and behavior of a tower unit.
  */
 package io.github.towerDefense;
 
-
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer; // Import Color for drawing towers
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
-
-public class Towers { // Renamed from TowerPlacementManager to Towers
+public class Towers {
     public float x, y;
-    public static final float SIZE = 40; // Size of the square
-    private Color color;
+    public static final float SIZE = 50; // Size of the tower (e.g., a square)
     private float attackRange;
-    private int attackDamage;
+    private float attackDamage;
     private float attackCooldown;
     private float timeSinceLastAttack;
+    private Color color;
 
-
-
-    // Constructor — no return type, same name as class
-    public Towers(float x, float y, Color color) {
+    /**
+     * Constructor for the Towers class.
+     * @param x The x-coordinate of the tower.
+     * @param y The y-coordinate of the tower.
+     * @param attackRange The range within which the tower can attack enemies.
+     * @param attackDamage The damage dealt by the tower per attack.
+     * @param attackCooldown The time (in seconds) between attacks.
+     * @param color The color of the tower.
+     */
+    public Towers(float x, float y, float attackRange, float attackDamage, float attackCooldown, Color color) {
         this.x = x - SIZE / 2f; // Center the tower
         this.y = y - SIZE / 2f;
+        this.attackRange = attackRange;
+        this.attackDamage = attackDamage;
+        this.attackCooldown = attackCooldown;
+        this.timeSinceLastAttack = 0; // Initialize cooldown timer
         this.color = color;
-
-        this.attackRange = 100f; // Example range
-        this.attackDamage = 10; // Example damage
-        this.attackCooldown = 1f; // Example cooldown in seconds
-        this.timeSinceLastAttack = 0f; // Initialize attack timer
     }
 
+    /**
+     * Updates the tower's internal state, primarily its attack cooldown.
+     * @param delta The time in seconds since the last render frame.
+     */
+    public void update(float delta) {
+        timeSinceLastAttack += delta;
+    }
 
-    
-    /** 
-     * @param shapeRenderer
+    /**
+     * Renders the tower on the screen.
+     * @param shapeRenderer The ShapeRenderer used for drawing.
      */
     public void render(ShapeRenderer shapeRenderer) {
-        shapeRenderer.setColor(Color.WHITE); 
-        shapeRenderer.rect(x, y, SIZE, SIZE);
+        shapeRenderer.setColor(color); // Set the tower's color
+        shapeRenderer.rect(x, y, SIZE, SIZE); // Draw the tower as a square
+        // Optionally, draw attack range for debugging
+        // shapeRenderer.circle(getCenter().x, getCenter().y, attackRange);
     }
-    public void update(float delta) {
-        timeSinceLastAttack += delta; // Update the attack timer
-    }
-    public boolean canAttack(){
+
+    /**
+     * Checks if the tower can attack based on its cooldown.
+     * @return true if the tower is ready to attack, false otherwise.
+     */
+    public boolean canAttack() {
         if (timeSinceLastAttack >= attackCooldown) {
-            timeSinceLastAttack = 0; // Reset the timer after an attack
-            return true; // Tower can attack
+            timeSinceLastAttack = 0; // Reset cooldown
+            return true;
         }
-        return false; // Tower is still on cooldown
-    }
-    public Vector2 getCenter(){
-        return new Vector2(x + SIZE / 2f, y + SIZE / 2f); // Return the center of the tower
+        return false;
     }
 
+    /**
+     * Gets the center position of the tower.
+     * @return A Vector2 representing the center of the tower.
+     */
+    public Vector2 getCenter() {
+        return new Vector2(x + SIZE / 2f, y + SIZE / 2f);
+    }
+
+    /**
+     * Gets the attack range of the tower.
+     * @return The attack range.
+     */
     public float getAttackRange() {
-        return attackRange; // Return the attack range
+        return attackRange;
     }
 
+    /**
+     * Gets the attack damage of the tower.
+     * @return The attack damage.
+     */
     public float getAttackDamage() {
-        return attackDamage; // Return the attack damage
+        return attackDamage;
     }
 }

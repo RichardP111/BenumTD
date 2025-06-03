@@ -1,77 +1,59 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-05-27
+ * Last modified: 2025-06-02
  * This file is part of Rise of Benum Tower Defense.
- * keeps track of all Towers placed.
+ * Manages the placement of towers on the game map.
  */
-package io.github.towerDefense; // Suggesting a new package for input handling
+package io.github.towerDefense;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.Color;
-import java.util.ArrayList; // Import ArrayList
+import com.badlogic.gdx.math.Vector3; // For unprojecting screen coordinates
 
-import io.github.towerDefense.Towers; // Import the correct Towers class
+import java.util.ArrayList;
 
 public class TowerPlacementManager {
     private OrthographicCamera camera;
-    private Vector3 unprojectedCoordinates;
-    private ArrayList<Towers> existingTowers; // New field to hold existing towers
+    private ArrayList<Towers> towers; // Reference to the list of towers in the game
+    private float placementCooldown = 0.5f; // Cooldown to prevent rapid placement
+    private float timeSinceLastPlacement = 0f;
 
-    public TowerPlacementManager(OrthographicCamera camera, ArrayList<Towers> existingTowers) {
+    /**
+     * Constructor for TowerPlacementManager.
+     * @param camera The game's camera, used for unprojecting screen coordinates.
+     * @param towers The ArrayList where new towers will be added.
+     */
+    public TowerPlacementManager(OrthographicCamera camera, ArrayList<Towers> towers) {
         this.camera = camera;
-        this.unprojectedCoordinates = new Vector3();
-        this.existingTowers = existingTowers; // Initialize the list
+        this.towers = towers;
     }
 
     /**
-     * Checks for a left-click and returns a new Towers object at the clicked position
-     * in world coordinates, ONLY if it doesn't overlap with existing towers.
-     *
-     * @return A new Towers object if a left-click occurred and no overlap, otherwise null.
+     * Checks for user input (left click) to place a new tower.
+     * Applies a cooldown to prevent multiple towers from being placed with a single click.
+     * @param delta The time in seconds since the last render frame.
+     * @return A new Towers object if a tower was placed, otherwise null.
      */
-    public Towers getNewTowerOnLeftClick() {
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            // Get raw screen click coordinates
-            float screenX = Gdx.input.getX();
-            float screenY = Gdx.input.getY();
+    public Towers getNewTowerOnLeftClick(float delta) {
+        timeSinceLastPlacement += delta;
 
-            // Set the vector with screen coordinates
-            unprojectedCoordinates.set(screenX, screenY, 0);
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && timeSinceLastPlacement >= placementCooldown) {
+            // Get mouse coordinates
+            float mouseX = Gdx.input.getX();
+            float mouseY = Gdx.input.getY();
 
-            // Convert screen coordinates to world coordinates using the camera
-            camera.unproject(unprojectedCoordinates);
+            // Unproject screen coordinates to world coordinates
+            Vector3 worldCoordinates = camera.unproject(new Vector3(mouseX, mouseY,0));
 
-            // Create a potential new tower for collision checking
-            Towers potentialNewTower = new Towers(unprojectedCoordinates.x, unprojectedCoordinates.y, Color.WHITE); // Assuming a default color for the tower
-
-            // Check for overlap with existing towers
-            if (!isOverlapping(potentialNewTower)) {
-                return potentialNewTower; // No overlap, so place the tower
-            } else {
-                System.out.println("Cannot place tower: overlaps with existing tower.");
-            }
+            // For now, place a simple tower at the clicked location
+            // You can add more complex logic here, like checking for valid placement spots
+            // or selecting tower types from a UI.
+            Towers newTower = new Towers(worldCoordinates.x, worldCoordinates.y, 150f, 1f, 1.5f, Color.BLUE);
+            timeSinceLastPlacement = 0f; // Reset cooldown
+            return newTower;
         }
-        return null; // No new tower was placed or it overlapped
-    }
-
-    /**
-     * Checks if a potential new tower overlaps with any of the existing towers.
-     * @param potentialTower The tower to check for overlap.
-     * @return true if there is an overlap, false otherwise.
-     */
-    private boolean isOverlapping(Towers potentialTower) {
-        for (Towers existingTower : existingTowers) {
-            // Simple AABB (Axis-Aligned Bounding Box) collision detection
-            if (potentialTower.x < existingTower.x + Towers.SIZE &&
-                potentialTower.x + Towers.SIZE > existingTower.x &&
-                potentialTower.y < existingTower.y + Towers.SIZE &&
-                potentialTower.y + Towers.SIZE > existingTower.y) {
-                return true; // Overlap detected
-            }
-        }
-        return false; // No overlap
+        return null;
     }
 }

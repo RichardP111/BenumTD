@@ -1,5 +1,9 @@
+audio/main.mp3
 benumTowerLogo.png
 icon.png
+maps/jungleMap.jpg
+maps/jungleMap.png
+settings.png
 startBackground.png
 textBasedLogo.png
 ui/default.fnt
