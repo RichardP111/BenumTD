@@ -87,6 +87,7 @@ public class jungleMap implements Screen {
         individualEnemySpawnTimer = 0f;
 
         font = new BitmapFont(); 
+        font.getData().setScale(3f); // Scale the font size
         glyphLayout = new GlyphLayout(); 
     }
 
@@ -114,10 +115,8 @@ public class jungleMap implements Screen {
         font.draw(batch, waveText, textX, textY);
         String coinText = "BenumCoin: " + benumCoin;
         glyphLayout.setText(font, coinText);
-        font.setColor(Color.BLACK);
-        font.draw(batch, coinText, 10, screenHeight - 10); // Draw coins at the top left
         font.setColor(Color.YELLOW);
-        font.draw(batch, coinText, 10, screenHeight - 10); // Draw coins at the top left in yellow
+        font.draw(batch, coinText, 50, screenHeight-50); // Draw coins at the top left in yellow
         batch.end();
 
         // Handle tower placement (logic only)
