@@ -30,32 +30,24 @@ public class Towers {
      * @param color The color of the tower.
      */
     public Towers(float x, float y, float attackRange, float attackDamage, float attackCooldown, Color color) {
-        this.x = x - SIZE / 2f; // Center the tower
+        this.x = x - SIZE / 2f; 
         this.y = y - SIZE / 2f;
         this.attackRange = attackRange;
         this.attackDamage = attackDamage;
         this.attackCooldown = attackCooldown;
-        this.timeSinceLastAttack = 0; // Initialize cooldown timer
+        this.timeSinceLastAttack = 0; 
         this.color = color;
     }
 
-    /**
-     * Updates the tower's internal state, primarily its attack cooldown.
-     * @param delta The time in seconds since the last render frame.
-     */
+    
     public void update(float delta) {
         timeSinceLastAttack += delta;
     }
 
-    /**
-     * Renders the tower on the screen.
-     * @param shapeRenderer The ShapeRenderer used for drawing.
-     */
+    
     public void render(ShapeRenderer shapeRenderer) {
-        shapeRenderer.setColor(color); // Set the tower's color
-        shapeRenderer.rect(x, y, SIZE, SIZE); // Draw the tower as a square
-        // Optionally, draw attack range for debugging
-        // shapeRenderer.circle(getCenter().x, getCenter().y, attackRange);
+        shapeRenderer.setColor(color); 
+        shapeRenderer.rect(x, y, SIZE, SIZE); 
     }
 
     /**

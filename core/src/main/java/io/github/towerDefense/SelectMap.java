@@ -22,9 +22,7 @@ public class SelectMap implements Screen {
     }
 
     
-    /** 
-     * @param delta
-     */
+
     @Override
     public void render(float delta) {
         
