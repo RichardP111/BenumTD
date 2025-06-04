@@ -1,10 +1,9 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-06-02
+ * Last modified: 2025-06-04
  * This file is part of Rise of Benum Tower Defense.
  * Jungle map class for the game.
- * This class will handle the jungle map layout and logic,
- * including enemy waves, tower placement, and tower-enemy interactions.
+ * This class will handle the jungle map layout and logic
  */
 package io.github.towerDefense.map;
 
@@ -12,15 +11,26 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20; 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor; 
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.viewport.ScreenViewport; 
 
 import io.github.towerDefense.Enemy;
 import io.github.towerDefense.Main;
@@ -49,10 +59,39 @@ public class jungleMap implements Screen {
     private GlyphLayout glyphLayout;
 
     private ArrayList<Towers> towers;
-    private OrthographicCamera camera;
+    private OrthographicCamera camera; 
     private TowerPlacementManager placementManager;
 
     private int benumCoin;
+
+    private Stage stage; 
+    private DragAndDrop dragAndDrop;
+    private Texture towerIconTexture1, towerIconTexture2, towerIconTexture3;
+    private Image towerDraggableImage1, towerDraggableImage2, towerDraggableImage3;
+    private Actor mapDropTargetActor; 
+    private DragAndDrop.Payload currentDragPayload = null; 
+
+    //tower properties
+    private static final int COST_TOWER_1 = 50;
+    private static final Color COLOR_TOWER_1 = Color.BLUE;
+    private static final float RANGE_TOWER_1 = 150f;
+    private static final float DAMAGE_TOWER_1 = 1f;
+    private static final float COOLDOWN_TOWER_1 = 1.5f;
+
+    private static final int COST_TOWER_2 = 75;
+    private static final Color COLOR_TOWER_2 = Color.GREEN;
+    private static final float RANGE_TOWER_2 = 170f;
+    private static final float DAMAGE_TOWER_2 = 1.2f;
+    private static final float COOLDOWN_TOWER_2 = 1.3f;
+
+    private static final int COST_TOWER_3 = 100;
+    private static final Color COLOR_TOWER_3 = Color.RED;
+    private static final float RANGE_TOWER_3 = 200f;
+    private static final float DAMAGE_TOWER_3 = 1.5f;
+    private static final float COOLDOWN_TOWER_3 = 1.0f;
+
+    private static final String TAG = "jungleMap"; 
+    private static final float PATH_CLEARANCE_FROM_TOWER_EDGE = 10f; 
 
     public jungleMap(Main game) {
         this.game = game;
@@ -66,33 +105,182 @@ public class jungleMap implements Screen {
         towers = new ArrayList<>();
         enemies = new ArrayList<>();
 
-        //start camera for tower placement
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        benumCoin =200; //coins for the player
-
-        placementManager = new TowerPlacementManager(camera, towers, this);
-
+        benumCoin = 200; 
+        placementManager = new TowerPlacementManager(towers, this); 
         initializePath();
 
         waveTimer = TIME_BETWEEN_WAVES; 
         waveNumber = 1;
-        enemiesPerWave = 3; //starting number of enemies per wave
+        enemiesPerWave = 3; 
         enemiesSpawnedInWave = 0;
-        enemySpawnIntervalInWave = 1.0f; //time between individual enemy spawns
+        enemySpawnIntervalInWave = 1.0f; 
         individualEnemySpawnTimer = 0f;
 
         font = new BitmapFont(); 
-        glyphLayout = new GlyphLayout(); 
+        glyphLayout = new GlyphLayout();
+        
+        stage = new Stage(new ScreenViewport()); 
+        dragAndDrop = new DragAndDrop();
+
+        mapDropTargetActor = new Actor();
+        mapDropTargetActor.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); 
+        stage.addActor(mapDropTargetActor); 
+
+        Pixmap pixmap1 = new Pixmap(50, 50, Pixmap.Format.RGBA8888);
+        pixmap1.setColor(COLOR_TOWER_1);
+        pixmap1.fillRectangle(0, 0, 50, 50);
+        towerIconTexture1 = new Texture(pixmap1);
+        pixmap1.dispose();
+
+        Pixmap pixmap2 = new Pixmap(50, 50, Pixmap.Format.RGBA8888);
+        pixmap2.setColor(COLOR_TOWER_2);
+        pixmap2.fillRectangle(0, 0, 50, 50);
+        towerIconTexture2 = new Texture(pixmap2);
+        pixmap2.dispose();
+
+        Pixmap pixmap3 = new Pixmap(50, 50, Pixmap.Format.RGBA8888);
+        pixmap3.setColor(COLOR_TOWER_3);
+        pixmap3.fillRectangle(0, 0, 50, 50);
+        towerIconTexture3 = new Texture(pixmap3);
+        pixmap3.dispose();
+
+        towerDraggableImage1 = new Image(towerIconTexture1);
+        towerDraggableImage1.setPosition(10, 10); 
+        stage.addActor(towerDraggableImage1);
+      
+        towerDraggableImage2 = new Image(towerIconTexture2);
+        towerDraggableImage2.setPosition(10 + towerDraggableImage1.getWidth() + 10, 10);
+        stage.addActor(towerDraggableImage2);
+
+        towerDraggableImage3 = new Image(towerIconTexture3);
+        towerDraggableImage3.setPosition(10 + towerDraggableImage1.getWidth() + 10 + towerDraggableImage2.getWidth() + 10, 10);
+        stage.addActor(towerDraggableImage3);
+
+        addDragAndDropSource(towerDraggableImage1, "TowerType1", towerIconTexture1);
+        addDragAndDropSource(towerDraggableImage2, "TowerType2", towerIconTexture2);
+        addDragAndDropSource(towerDraggableImage3, "TowerType3", towerIconTexture3);
+        
+        dragAndDrop.addTarget(new DragAndDrop.Target(mapDropTargetActor) { 
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                Vector3 worldCoordinates = camera.unproject(new Vector3(x, y, 0)); 
+                
+                float potentialTowerCenterX = worldCoordinates.x;
+                float potentialTowerCenterY = worldCoordinates.y;
+                float checkTopLeftX = potentialTowerCenterX - Towers.SIZE / 2f;
+                float checkTopLeftY = potentialTowerCenterY - Towers.SIZE / 2f;
+
+                boolean canAfford = getBenumCoin() >= getTowerCost( (String) payload.getObject());
+                boolean overlaps = placementManager.isOverlapping(checkTopLeftX, checkTopLeftY);
+                boolean nearPath = placementManager.isNearPath(potentialTowerCenterX, potentialTowerCenterY, enemyPath, PATH_CLEARANCE_FROM_TOWER_EDGE);
+
+                if (payload.getDragActor() != null) {
+                    payload.getDragActor().setPosition(potentialTowerCenterX - payload.getDragActor().getWidth() / 2f,
+                                                        potentialTowerCenterY - payload.getDragActor().getHeight() / 2f);
+
+                    if (canAfford && !overlaps && !nearPath) {
+                         payload.getDragActor().setColor(Color.GREEN); 
+                    } else {
+                         payload.getDragActor().setColor(Color.RED); 
+                    }
+                }
+                return true; 
+            }
+
+            public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
+                if (payload.getDragActor() != null) {
+                    payload.getDragActor().setColor(Color.WHITE); 
+                }
+            }
+
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                Vector3 worldCoordinates = camera.unproject(new Vector3(x, y, 0)); 
+
+                String towerTypeString = (String) payload.getObject();
+                
+                int towerCost = getTowerCost(towerTypeString);
+                Color towerColor = Color.WHITE; 
+                float attackRange = 0, attackDamage = 0, attackCooldown = 0;
+
+                if ("TowerType1".equals(towerTypeString)) {
+                    towerColor = COLOR_TOWER_1; attackRange = RANGE_TOWER_1; attackDamage = DAMAGE_TOWER_1; attackCooldown = COOLDOWN_TOWER_1;
+                } else if ("TowerType2".equals(towerTypeString)) {
+                    towerColor = COLOR_TOWER_2; attackRange = RANGE_TOWER_2; attackDamage = DAMAGE_TOWER_2; attackCooldown = COOLDOWN_TOWER_2;
+                } else if ("TowerType3".equals(towerTypeString)) {
+                    towerColor = COLOR_TOWER_3; attackRange = RANGE_TOWER_3; attackDamage = DAMAGE_TOWER_3; attackCooldown = COOLDOWN_TOWER_3;
+                }
+
+                float placeX = worldCoordinates.x;
+                float placeY = worldCoordinates.y;
+
+                float checkTopLeftX = placeX - Towers.SIZE / 2f;
+                float checkTopLeftY = placeY - Towers.SIZE / 2f;
+                
+                boolean canAfford = getBenumCoin() >= towerCost;
+                boolean overlaps = placementManager.isOverlapping(checkTopLeftX, checkTopLeftY);
+                boolean nearPath = placementManager.isNearPath(placeX, placeY, enemyPath, PATH_CLEARANCE_FROM_TOWER_EDGE);
+
+
+                if (canAfford && !overlaps && !nearPath) {
+                    if (spendBenumCoin(towerCost)) {
+                        Towers newTower = new Towers(placeX, placeY, attackRange, attackDamage, attackCooldown, towerColor);
+                        towers.add(newTower);
+                    }
+                } else {
+                    
+                }
+            }
+        });
+
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(stage); 
+        multiplexer.addProcessor(new InputAdapter() {});
+        Gdx.input.setInputProcessor(multiplexer);
     }
+
+    private int getTowerCost(String towerTypeString) {
+        if ("TowerType1".equals(towerTypeString)) return COST_TOWER_1;
+        if ("TowerType2".equals(towerTypeString)) return COST_TOWER_2;
+        if ("TowerType3".equals(towerTypeString)) return COST_TOWER_3;
+        return Integer.MAX_VALUE; 
+    }
+
+    private void addDragAndDropSource(final Image sourceActor, final String towerType, Texture dragActorTexture) {
+        dragAndDrop.addSource(new DragAndDrop.Source(sourceActor) {
+            public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                currentDragPayload = new DragAndDrop.Payload(); 
+                currentDragPayload.setObject(towerType); 
+
+                Image dragImage = new Image(dragActorTexture);
+                dragImage.setSize(Towers.SIZE, Towers.SIZE); 
+                currentDragPayload.setDragActor(dragImage); 
+                
+                dragAndDrop.setDragActorPosition(-dragImage.getWidth() / 2f, -dragImage.getHeight() / 2f);
+                                
+                sourceActor.getColor().a = 0.4f; 
+                return currentDragPayload;
+            }
+
+            @Override
+            public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+                sourceActor.getColor().a = 1f; 
+                if (payload != null && payload.getDragActor() != null) { 
+                     payload.getDragActor().setColor(Color.WHITE); 
+                }
+                currentDragPayload = null;
+            }
+        });
+    }
+
 
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();
         int screenHeight = Gdx.graphics.getHeight();
 
-        camera.update();
+        camera.update(); 
 
         batch.setProjectionMatrix(camera.combined); 
         batch.begin();
@@ -100,31 +288,55 @@ public class jungleMap implements Screen {
 
         String waveText = "WAVE " + waveNumber + "/" + MAX_WAVES;
         glyphLayout.setText(font, waveText);
-
         float textX = (screenWidth - glyphLayout.width) / 2;
-        float textY = screenHeight - 50;
-
+        float textY = screenHeight - 20; 
         font.setColor(Color.WHITE);
         font.draw(batch, waveText, textX, textY);
+        
         String coinText = "BenumCoin: " + benumCoin;
         glyphLayout.setText(font, coinText);
         font.setColor(Color.BLACK);
-        font.draw(batch, coinText, 10, screenHeight - 10); 
+        font.draw(batch, coinText, 11, screenHeight - 19); 
         font.setColor(Color.YELLOW);
-        font.draw(batch, coinText, 10, screenHeight - 10); 
+        font.draw(batch, coinText, 10, screenHeight - 20); 
         batch.end();
 
-        Towers newTower = placementManager.getNewTowerOnLeftClick(delta);
-        if (newTower != null) {
-            towers.add(newTower);
-            System.out.println("Tower placed at: " + newTower.x + ", " + newTower.y);
+        if (currentDragPayload != null) {
+            Vector3 mouseScreenCoords = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+            Vector3 mouseWorldCoords = camera.unproject(mouseScreenCoords.cpy());
+
+            float potentialTowerCenterX = mouseWorldCoords.x;
+            float potentialTowerCenterY = mouseWorldCoords.y;
+            float checkTopLeftX = potentialTowerCenterX - Towers.SIZE / 2f;
+            float checkTopLeftY = potentialTowerCenterY - Towers.SIZE / 2f;
+
+            String towerTypeString = (String) currentDragPayload.getObject();
+            boolean canAfford = getBenumCoin() >= getTowerCost(towerTypeString);
+            boolean overlaps = placementManager.isOverlapping(checkTopLeftX, checkTopLeftY);
+            boolean nearPath = placementManager.isNearPath(potentialTowerCenterX, potentialTowerCenterY, enemyPath, PATH_CLEARANCE_FROM_TOWER_EDGE);
+
+            Gdx.gl.glEnable(GL20.GL_BLEND); 
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled); 
+
+            if (canAfford && !overlaps && !nearPath) {
+                shapeRenderer.setColor(0, 1, 0, 0.3f);
+            } else {
+                shapeRenderer.setColor(1, 0, 0, 0.3f); 
+            }
+
+
+            shapeRenderer.circle(potentialTowerCenterX, potentialTowerCenterY, Towers.SIZE * 2f);
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
         }
 
         shapeRenderer.setProjectionMatrix(camera.combined); 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled); 
 
         for (Towers tower : towers) {
-            tower.update(delta);
+            tower.update(delta); 
             tower.render(shapeRenderer);
         }
 
@@ -137,24 +349,19 @@ public class jungleMap implements Screen {
             for (Towers tower : towers) {
                 Vector2 towerCenter = tower.getCenter();
                 Vector2 enemyCenter = new Vector2(enemy.x + Enemy.SIZE / 2f, enemy.y + Enemy.SIZE / 2f);
-
                 float distance = towerCenter.dst(enemyCenter);
 
                 if (distance <= tower.getAttackRange()) {
                     if (tower.canAttack()) {
                         enemy.takeDamage((int) tower.getAttackDamage());
-                        System.out.println("Tower attacked enemy! Enemy health: " + enemy.getHealth());
                     }
                 }
             }
 
             if (!enemy.isAlive() || enemy.hasReachedEnd()) {
                 if (enemy.hasReachedEnd()) {
-                    System.out.println("Enemy reached the end!");
-                    //player life
                 } else if (!enemy.isAlive()) {
-                    System.out.println("Enemy defeated!");
-                    addbenumCoin(1);
+                    addBenumCoin(10); 
                 }
                 enemyIterator.remove();
             }
@@ -168,52 +375,61 @@ public class jungleMap implements Screen {
                 if (individualEnemySpawnTimer >= enemySpawnIntervalInWave) {
                     Vector2 startPoint = enemyPath.getWaypoint(0);
                     if (startPoint != null) {
-                        enemies.add(new Enemy(startPoint.x, startPoint.y, 70f, 3, Color.RED, enemyPath));
+                        int enemyHealth = 3 + waveNumber;
+                        float enemySpeed = 70f + waveNumber * 2f;
+                        enemies.add(new Enemy(startPoint.x, startPoint.y, enemySpeed, enemyHealth, Color.ORANGE, enemyPath));
                         enemiesSpawnedInWave++;
                         individualEnemySpawnTimer = 0f;
                     }
                 }
-            } else if (enemies.isEmpty()) {
+            } else if (enemies.isEmpty()) { 
                 if (waveNumber < MAX_WAVES) {
                     waveNumber++;
-                    enemiesPerWave += 2;
-                    enemySpawnIntervalInWave = Math.max(0.2f, enemySpawnIntervalInWave - 0.1f);
+                    enemiesPerWave += 2; 
+                    enemySpawnIntervalInWave = Math.max(0.1f, enemySpawnIntervalInWave - 0.05f); 
                     enemiesSpawnedInWave = 0;
-                    waveTimer = 0f;
-                    System.out.println("start wave");
+                    waveTimer = 0f; 
                 } else {
-                    System.out.println("game win");
-                    //win game
+                    //end game
                 }
             }
         }
+        
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f)); 
+        stage.draw(); 
     }
 
     private void initializePath() {
         enemyPath = new JunglePath();
-       
     }
+
     public int getBenumCoin() {
         return benumCoin;
     }
-    public void addbenumCoin(int amount) {
+
+    public void addBenumCoin(int amount) {
         benumCoin += amount;
-        System.out.println("benumcoin add");
     }
+
     public boolean spendBenumCoin(int amount) {
         if (benumCoin >= amount) {
             benumCoin -= amount;
-            System.out.println("coin used");
             return true; 
         } else {
-            System.out.println("benumcoin not good");
             return false; 
         }
     }
 
     @Override
     public void resize(int width, int height) {
-        camera.setToOrtho(false, width, height);
+        camera.setToOrtho(false, width, height); 
+        stage.getViewport().update(width, height, true); 
+
+        if (mapDropTargetActor != null) {
+            mapDropTargetActor.setBounds(0, 0, width, height);
+        }
+
+        enemyPath = new JunglePath(); 
         enemyPath.addWaypoint(width * 1.00f, height * 0.87f);
         enemyPath.addWaypoint(width * 0.82f, height * 0.87f);
         enemyPath.addWaypoint(width * 0.82f, height * 0.66f);
@@ -264,7 +480,7 @@ public class jungleMap implements Screen {
         enemyPath.addWaypoint(width * 0.15f, height * 0.45f);
         enemyPath.addWaypoint(width * 0.20f, height * 0.40f);
         enemyPath.addWaypoint(width * 0.20f, height * 0.20f);
-        enemyPath.addWaypoint(width * 0.00f, height * 0.20f);
+        enemyPath.addWaypoint(width * 0.00f, height * 0.20f); 
     }
 
     @Override public void pause() {}
@@ -277,5 +493,9 @@ public class jungleMap implements Screen {
         if (shapeRenderer != null) shapeRenderer.dispose();
         if (backgroundImage != null) backgroundImage.dispose();
         if (font != null) font.dispose(); 
+        if (stage != null) stage.dispose();
+        if (towerIconTexture1 != null) towerIconTexture1.dispose();
+        if (towerIconTexture2 != null) towerIconTexture2.dispose();
+        if (towerIconTexture3 != null) towerIconTexture3.dispose();
     }
 }
