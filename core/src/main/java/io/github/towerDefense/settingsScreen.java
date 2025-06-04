@@ -82,7 +82,7 @@ public class settingsScreen implements Screen {
         effectButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                effectEnabled = !effectEnabled; // Toggle effect state
+                effectEnabled = !effectEnabled; 
                 if (effectEnabled) {
                     Gdx.app.log("Settings", "Effects Enabled");
                 } else {
@@ -114,15 +114,13 @@ public class settingsScreen implements Screen {
         Table settingsTable = new Table();
         settingsTable.setFillParent(true);
         settingsTable.center();
-        settingsTable.add(musicButton).size(120); // Adjust size as needed
-        settingsTable.add(effectButton).size(120).pad(10); // Adjust size as needed
+        settingsTable.add(musicButton).size(120); 
+        settingsTable.add(effectButton).size(120).pad(10); 
         stage.addActor(settingsTable);
     }
 
     
-    /** 
-     * @param delta
-     */
+
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();

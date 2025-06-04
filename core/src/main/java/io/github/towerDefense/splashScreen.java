@@ -31,14 +31,11 @@ public class splashScreen implements Screen {
     }
 
     
-    /** 
-     * @param delta
-     */
+
     @Override
     public void render(float delta) {
         elapsedTime += delta;
 
-        // Handle state logic
         switch (state) {
             case FADE_IN:
                 alpha += delta / 1f; // Fade in over 2s
@@ -58,7 +55,7 @@ public class splashScreen implements Screen {
                 alpha -= delta / 1f; // Fade out over 1s
                 if (alpha <= 0f) {
                     alpha = 0f;
-                    game.setScreen(new startScreen(game)); // Switch screen here
+                    game.setScreen(new startScreen(game)); // switch screen here
                     dispose();
                     return;
                 }
@@ -81,7 +78,7 @@ public class splashScreen implements Screen {
         int y = (windowHeight - scaledHeight) / 2;
 
         batch.begin();
-        batch.setColor(1f, 1f, 1f, alpha); // Apply alpha
+        batch.setColor(1f, 1f, 1f, alpha); 
         batch.draw(image, x, y, scaledWidth, scaledHeight);
         batch.end();
     }

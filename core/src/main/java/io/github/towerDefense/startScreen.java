@@ -106,14 +106,12 @@ public class startScreen implements Screen {
         Table settingsTable = new Table();
         settingsTable.setFillParent(true);
         settingsTable.top().right().pad(20);
-        settingsTable.add(settingsButton).size(70); // Adjust size as needed
+        settingsTable.add(settingsButton).size(70); 
         stage.addActor(settingsTable);
     }
 
     
-    /** 
-     * @param delta
-     */
+
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();
