@@ -13,30 +13,30 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color; // Import ShapeRenderer
-import com.badlogic.gdx.graphics.Texture; // Import Color
-import com.badlogic.gdx.graphics.g2d.SpriteBatch; // Import Vector2
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch; 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 import io.github.towerDefense.Enemy;
-import io.github.towerDefense.Main; // Import Enemy
+import io.github.towerDefense.Main; 
 
 public class classMap implements Screen {
     private final Main game;
 
     private Texture backgroundImage;
     private SpriteBatch batch;
-    private ShapeRenderer shapeRenderer; // Add ShapeRenderer
-    private ArrayList<Enemy> enemies; // List to hold enemies
-    private JunglePath enemyPath; // The path for enemies to follow
+    private ShapeRenderer shapeRenderer; 
+    private ArrayList<Enemy> enemies; 
+    private JunglePath enemyPath; //path for enemies to follow
 
     private float waveTimer;
-    private final float TIME_BETWEEN_WAVES = 5f; // Time between waves
+    private final float TIME_BETWEEN_WAVES = 5f; 
     private int waveNumber;
     private int enemiesPerWave;
     private int enemiesSpawnedInWave;
-    private float enemySpawnIntervalInWave; // Time between individual enemy spawns within a wave
+    private float enemySpawnIntervalInWave; //time between each spawn 
     private float individualEnemySpawnTimer;
 
     public classMap(Main game) {
@@ -46,20 +46,18 @@ public class classMap implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        shapeRenderer = new ShapeRenderer(); // Initialize ShapeRenderer
-        backgroundImage = new Texture("maps/jungleMap.png");
+        shapeRenderer = new ShapeRenderer();
+        backgroundImage = new Texture("maps/jungleMap.png"); //map of jungle
         enemies = new ArrayList<>();
         
-        initializePath(); // Define the enemy path
-        
-        waveTimer = TIME_BETWEEN_WAVES; // Start timer for the first wave
+        initializePath(); //start the path for enemies
+
+        waveTimer = TIME_BETWEEN_WAVES; 
         waveNumber = 0;
-        enemiesPerWave = 5; // Initial number of enemies per wave
-        enemySpawnIntervalInWave = 1f; // Initial spawn interval
+        enemiesPerWave = 5; //how many enemies in each wave
+        enemySpawnIntervalInWave = 1f; //time between each enemy spawn in a wave
         individualEnemySpawnTimer = 0f;
     }
-
-// In your cityMap.java file, within the initializePath() method:
 
 private void initializePath() {
     enemyPath = new JunglePath();
@@ -67,10 +65,10 @@ private void initializePath() {
     float w = Gdx.graphics.getWidth();
     float h = Gdx.graphics.getHeight();
 
-    enemyPath.addWaypoint(w * 1.00f, h * 0.87f); // Start off-screen top right
-    enemyPath.addWaypoint(w * 0.82f, h * 0.87f); // Move down
-    enemyPath.addWaypoint(w * 0.82f, h * 0.66f); // Start curve
-    enemyPath.addWaypoint(w * 0.84f, h * 0.65f); // Wrap around right pond
+    enemyPath.addWaypoint(w * 1.00f, h * 0.87f);
+    enemyPath.addWaypoint(w * 0.82f, h * 0.87f);
+    enemyPath.addWaypoint(w * 0.82f, h * 0.66f);
+    enemyPath.addWaypoint(w * 0.84f, h * 0.65f); 
     enemyPath.addWaypoint(w * 0.86f, h * 0.64f);
     enemyPath.addWaypoint(w * 0.88f, h * 0.61f);
     enemyPath.addWaypoint(w * 0.91f, h * 0.59f);
@@ -121,11 +119,6 @@ private void initializePath() {
     enemyPath.addWaypoint(w * 0.00f, h * 0.20f);
 }
 
-
-    
-    /** 
-     * @param delta
-     */
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();
@@ -135,7 +128,7 @@ private void initializePath() {
         batch.draw(backgroundImage, 0, 0, screenWidth, screenHeight);
         batch.end();
 
-        // Update and render enemies
+        //update and render enemies
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
@@ -143,25 +136,22 @@ private void initializePath() {
             enemy.move(delta);
             enemy.render(shapeRenderer);
 
-            // Remove enemy if it's no longer alive or has reached the end of the path
+            //remove enemy if it's no longer alive or has reached the end of the path
             if (!enemy.isAlive() || enemy.hasReachedEnd()) {
                 if(enemy.hasReachedEnd()){
-                    System.out.println("Enemy reached the end!");
-                    // Here you would typically reduce player's health/lives
+                    //reduce player health in future 
                 }
                 enemyIterator.remove();
             }
         }
         shapeRenderer.end();
 
-        // Wave management
+        //wave management
         waveTimer += delta;
         if (waveTimer >= TIME_BETWEEN_WAVES) {
             if (enemiesSpawnedInWave < enemiesPerWave) {
                 individualEnemySpawnTimer += delta;
                 if (individualEnemySpawnTimer >= enemySpawnIntervalInWave) {
-                    // Spawn a new enemy at the start of the path
-                    // Ensure the enemy is initialized at the first waypoint's coordinates
                     Vector2 startPoint = enemyPath.getWaypoint(0);
                     if (startPoint != null) {
                         enemies.add(new Enemy(startPoint.x, startPoint.y, 70f, 3, Color.RED, enemyPath));
@@ -170,36 +160,14 @@ private void initializePath() {
                     }
                 }
             } else if (enemies.isEmpty()) {
-                // All enemies from the current wave are defeated or reached the end
-                // Start a new wave
                 waveNumber++;
-                enemiesPerWave += 2; // Increase enemies for the next wave
+                enemiesPerWave += 2; //icrease enemies for the next wave
                 enemySpawnIntervalInWave = Math.max(0.2f, enemySpawnIntervalInWave - 0.1f); // Make spawns faster
                 enemiesSpawnedInWave = 0;
-                waveTimer = 0f; // Reset wave timer
-                System.out.println("Starting Wave " + waveNumber + "!");
+                waveTimer = 0f; //reset timer
             }
         }
-
-        // Optional: Draw the path for debugging
-        drawPath();
     }
-
-    // Helper method to draw the enemy path (for debugging)
-    private void drawPath() {
-        if (enemyPath == null || enemyPath.getNumWaypoints() < 2) {
-            return;
-        }
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.BLUE);
-        for (int i = 0; i < enemyPath.getNumWaypoints() - 1; i++) {
-            Vector2 p1 = enemyPath.getWaypoint(i);
-            Vector2 p2 = enemyPath.getWaypoint(i + 1);
-            shapeRenderer.line(p1.x, p1.y, p2.x, p2.y);
-        }
-        shapeRenderer.end();
-    }
-
 
     @Override public void resize(int width, int height) {}
     @Override public void pause() {}
@@ -209,6 +177,6 @@ private void initializePath() {
     @Override public void dispose() {
         batch.dispose();
         backgroundImage.dispose();
-        shapeRenderer.dispose(); // Dispose ShapeRenderer
+        shapeRenderer.dispose(); //dispose ShapeRenderer
     }
 }

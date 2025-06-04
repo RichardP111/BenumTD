@@ -11,7 +11,6 @@ package io.github.towerDefense.map;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -22,7 +21,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.graphics.GL20;
 
 import io.github.towerDefense.Enemy;
 import io.github.towerDefense.Main;
@@ -50,7 +48,6 @@ public class jungleMap implements Screen {
     private BitmapFont font;
     private GlyphLayout glyphLayout;
 
-    // Tower-related fields
     private ArrayList<Towers> towers;
     private OrthographicCamera camera;
     private TowerPlacementManager placementManager;
@@ -69,25 +66,24 @@ public class jungleMap implements Screen {
         towers = new ArrayList<>();
         enemies = new ArrayList<>();
 
-        // Initialize camera for tower placement
+        //start camera for tower placement
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        benumCoin =200; // Starting coins for the player
+        benumCoin =200; //coins for the player
 
         placementManager = new TowerPlacementManager(camera, towers, this);
 
         initializePath();
 
-        waveTimer = TIME_BETWEEN_WAVES; // Start with a full timer to immediately start first wave or wait
+        waveTimer = TIME_BETWEEN_WAVES; 
         waveNumber = 1;
-        enemiesPerWave = 3; // Starting number of enemies per wave
+        enemiesPerWave = 3; //starting number of enemies per wave
         enemiesSpawnedInWave = 0;
-        enemySpawnIntervalInWave = 1.0f; // Time between individual enemy spawns
+        enemySpawnIntervalInWave = 1.0f; //time between individual enemy spawns
         individualEnemySpawnTimer = 0f;
 
         font = new BitmapFont(); 
-        font.getData().setScale(3f); // Scale the font size
         glyphLayout = new GlyphLayout(); 
     }
 
@@ -96,54 +92,48 @@ public class jungleMap implements Screen {
         int screenWidth = Gdx.graphics.getWidth();
         int screenHeight = Gdx.graphics.getHeight();
 
-        // Update camera
         camera.update();
 
-        // 1. Draw Background and UI using SpriteBatch
-        batch.setProjectionMatrix(camera.combined); // Ensure batch uses the camera's projection matrix
+        batch.setProjectionMatrix(camera.combined); 
         batch.begin();
         batch.draw(backgroundImage, 0, 0, screenWidth, screenHeight);
 
-        // Draw Wave Counter
         String waveText = "WAVE " + waveNumber + "/" + MAX_WAVES;
         glyphLayout.setText(font, waveText);
 
         float textX = (screenWidth - glyphLayout.width) / 2;
-        float textY = screenHeight - 50; // Position text near the top center
+        float textY = screenHeight - 50;
 
         font.setColor(Color.WHITE);
         font.draw(batch, waveText, textX, textY);
         String coinText = "BenumCoin: " + benumCoin;
         glyphLayout.setText(font, coinText);
+        font.setColor(Color.BLACK);
+        font.draw(batch, coinText, 10, screenHeight - 10); 
         font.setColor(Color.YELLOW);
-        font.draw(batch, coinText, 50, screenHeight-50); // Draw coins at the top left in yellow
+        font.draw(batch, coinText, 10, screenHeight - 10); 
         batch.end();
 
-        // Handle tower placement (logic only)
         Towers newTower = placementManager.getNewTowerOnLeftClick(delta);
         if (newTower != null) {
             towers.add(newTower);
             System.out.println("Tower placed at: " + newTower.x + ", " + newTower.y);
         }
 
-        // 2. Draw Game Objects (Towers and Enemies) using ShapeRenderer
-        shapeRenderer.setProjectionMatrix(camera.combined); // Apply camera to shapeRenderer
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled); // Begin ShapeRenderer for filled shapes
+        shapeRenderer.setProjectionMatrix(camera.combined); 
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled); 
 
-        // Update and render towers
         for (Towers tower : towers) {
             tower.update(delta);
             tower.render(shapeRenderer);
         }
 
-        // Update and render enemies and handle tower attacks
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
             enemy.move(delta);
             enemy.render(shapeRenderer);
 
-            // Check for tower attacks on this enemy
             for (Towers tower : towers) {
                 Vector2 towerCenter = tower.getCenter();
                 Vector2 enemyCenter = new Vector2(enemy.x + Enemy.SIZE / 2f, enemy.y + Enemy.SIZE / 2f);
@@ -161,7 +151,7 @@ public class jungleMap implements Screen {
             if (!enemy.isAlive() || enemy.hasReachedEnd()) {
                 if (enemy.hasReachedEnd()) {
                     System.out.println("Enemy reached the end!");
-                    // Reduce player's health/lives here
+                    //player life
                 } else if (!enemy.isAlive()) {
                     System.out.println("Enemy defeated!");
                     addbenumCoin(1);
@@ -169,9 +159,8 @@ public class jungleMap implements Screen {
                 enemyIterator.remove();
             }
         }
-        shapeRenderer.end(); // End ShapeRenderer here
+        shapeRenderer.end(); 
 
-        // Wave management (logic only)
         waveTimer += delta;
         if (waveTimer >= TIME_BETWEEN_WAVES) {
             if (enemiesSpawnedInWave < enemiesPerWave) {
@@ -191,10 +180,10 @@ public class jungleMap implements Screen {
                     enemySpawnIntervalInWave = Math.max(0.2f, enemySpawnIntervalInWave - 0.1f);
                     enemiesSpawnedInWave = 0;
                     waveTimer = 0f;
-                    System.out.println("Starting Wave " + waveNumber + "!");
+                    System.out.println("start wave");
                 } else {
-                    System.out.println("All waves completed!");
-                    // Handle game won state
+                    System.out.println("game win");
+                    //win game
                 }
             }
         }
@@ -209,16 +198,16 @@ public class jungleMap implements Screen {
     }
     public void addbenumCoin(int amount) {
         benumCoin += amount;
-        System.out.println("BenumCoin added! Current total: " + benumCoin);
+        System.out.println("benumcoin add");
     }
     public boolean spendBenumCoin(int amount) {
         if (benumCoin >= amount) {
             benumCoin -= amount;
-            System.out.println("BenumCoin spent! Current total: " + benumCoin);
-            return true; // Successfully spent
+            System.out.println("coin used");
+            return true; 
         } else {
-            System.out.println("Not enough BenumCoin! Need " + amount + ", have " + benumCoin);
-            return false; // Not enough BenumCoin
+            System.out.println("benumcoin not good");
+            return false; 
         }
     }
 
