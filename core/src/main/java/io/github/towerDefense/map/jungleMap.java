@@ -165,8 +165,9 @@ public class jungleMap implements Screen {
         
         dragAndDrop.addTarget(new DragAndDrop.Target(mapDropTargetActor) { 
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Vector3 worldCoordinates = camera.unproject(new Vector3(x, y, 0)); 
-                
+                Vector3 mouseScreenCoords = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+                Vector3 worldCoordinates = camera.unproject(mouseScreenCoords.cpy()); 
+
                 float potentialTowerCenterX = worldCoordinates.x;
                 float potentialTowerCenterY = worldCoordinates.y;
                 float checkTopLeftX = potentialTowerCenterX - Towers.SIZE / 2f;
@@ -177,8 +178,6 @@ public class jungleMap implements Screen {
                 boolean nearPath = placementManager.isNearPath(potentialTowerCenterX, potentialTowerCenterY, enemyPath, PATH_CLEARANCE_FROM_TOWER_EDGE);
 
                 if (payload.getDragActor() != null) {
-                    payload.getDragActor().setPosition(potentialTowerCenterX - payload.getDragActor().getWidth() / 2f,
-                                                        potentialTowerCenterY - payload.getDragActor().getHeight() / 2f);
 
                     if (canAfford && !overlaps && !nearPath) {
                          payload.getDragActor().setColor(Color.GREEN); 
@@ -196,7 +195,7 @@ public class jungleMap implements Screen {
             }
 
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Vector3 worldCoordinates = camera.unproject(new Vector3(x, y, 0)); 
+                Vector3 worldCoordinates = camera.unproject(new Vector3(x, Gdx.graphics.getHeight()-y, 0)); 
 
                 String towerTypeString = (String) payload.getObject();
                 
@@ -212,14 +211,12 @@ public class jungleMap implements Screen {
                     towerColor = COLOR_TOWER_3; attackRange = RANGE_TOWER_3; attackDamage = DAMAGE_TOWER_3; attackCooldown = COOLDOWN_TOWER_3;
                 }
 
-                float placeX = worldCoordinates.x;
-                float placeY = worldCoordinates.y;
+                float placeX = worldCoordinates.x - Towers.SIZE / 2f;
+                float placeY = worldCoordinates.y - Towers.SIZE / 2f;
 
-                float checkTopLeftX = placeX - Towers.SIZE / 2f;
-                float checkTopLeftY = placeY - Towers.SIZE / 2f;
                 
                 boolean canAfford = getBenumCoin() >= towerCost;
-                boolean overlaps = placementManager.isOverlapping(checkTopLeftX, checkTopLeftY);
+                boolean overlaps = placementManager.isOverlapping(placeX, placeY);
                 boolean nearPath = placementManager.isNearPath(placeX, placeY, enemyPath, PATH_CLEARANCE_FROM_TOWER_EDGE);
 
 

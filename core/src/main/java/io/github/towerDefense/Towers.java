@@ -30,8 +30,8 @@ public class Towers {
      * @param color The color of the tower.
      */
     public Towers(float x, float y, float attackRange, float attackDamage, float attackCooldown, Color color) {
-        this.x = x - SIZE / 2f; 
-        this.y = y - SIZE / 2f;
+        this.x = x; 
+        this.y = y;
         this.attackRange = attackRange;
         this.attackDamage = attackDamage;
         this.attackCooldown = attackCooldown;
