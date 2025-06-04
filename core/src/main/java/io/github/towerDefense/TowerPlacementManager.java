@@ -12,6 +12,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3; // For unprojecting screen coordinates
 
+import io.github.towerDefense.map.jungleMap;
+
 import java.util.ArrayList;
 
 public class TowerPlacementManager {
@@ -19,15 +21,17 @@ public class TowerPlacementManager {
     private ArrayList<Towers> towers; // Reference to the list of towers in the game
     private float placementCooldown = 0.5f; // Cooldown to prevent rapid placement
     private float timeSinceLastPlacement = 0f;
+    private jungleMap gameMap;
 
     /**
      * Constructor for TowerPlacementManager.
      * @param camera The game's camera, used for unprojecting screen coordinates.
      * @param towers The ArrayList where new towers will be added.
      */
-    public TowerPlacementManager(OrthographicCamera camera, ArrayList<Towers> towers) {
+    public TowerPlacementManager(OrthographicCamera camera, ArrayList<Towers> towers, jungleMap gameMap) {
         this.camera = camera;
         this.towers = towers;
+        this.gameMap = gameMap;
     }
 
     /**
@@ -51,11 +55,18 @@ public class TowerPlacementManager {
             // You can add more complex logic here, like checking for valid placement spots
             // or selecting tower types from a UI.
             
-            // Check for overlapping before placing the tower
+           // Check for overlapping before placing the tower
             if (!isOverlapping(worldCoordinates.x - Towers.SIZE / 2f, worldCoordinates.y - Towers.SIZE / 2f)) {
-                Towers newTower = new Towers(worldCoordinates.x, worldCoordinates.y, 150f, 1f, 1.5f, Color.BLUE);
-                timeSinceLastPlacement = 0f; // Reset cooldown
-                return newTower;
+                // Check if player has enough BenumCoin
+                int towerCost = Towers.getCost(); // Get the cost of the tower
+                if (gameMap.spendBenumCoin(towerCost)) { // Attempt to spend BenumCoin
+                    Towers newTower = new Towers(worldCoordinates.x, worldCoordinates.y, 150f, 1f, 1.5f, Color.BLUE);
+                    timeSinceLastPlacement = 0f; // Reset cooldown
+                    System.out.println("Tower placed at: " + newTower.x + ", " + newTower.y + " for " + towerCost + " BenumCoin. Remaining: " + gameMap.getBenumCoin()); //
+                    return newTower;
+                } else {
+                    System.out.println("Cannot place tower: Not enough BenumCoin! Need " + towerCost + ", have " + gameMap.getBenumCoin()); //
+                }
             } else {
                 System.out.println("Cannot place tower: Overlapping with an existing tower.");
             }

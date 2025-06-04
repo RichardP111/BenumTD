@@ -11,6 +11,7 @@ package io.github.towerDefense.map;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.GL20;
 
 import io.github.towerDefense.Enemy;
 import io.github.towerDefense.Main;
@@ -53,6 +55,8 @@ public class jungleMap implements Screen {
     private OrthographicCamera camera;
     private TowerPlacementManager placementManager;
 
+    private int benumCoin;
+
     public jungleMap(Main game) {
         this.game = game;
     }
@@ -69,7 +73,9 @@ public class jungleMap implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        placementManager = new TowerPlacementManager(camera, towers);
+        benumCoin =200; // Starting coins for the player
+
+        placementManager = new TowerPlacementManager(camera, towers, this);
 
         initializePath();
 
@@ -106,6 +112,12 @@ public class jungleMap implements Screen {
 
         font.setColor(Color.WHITE);
         font.draw(batch, waveText, textX, textY);
+        String coinText = "BenumCoin: " + benumCoin;
+        glyphLayout.setText(font, coinText);
+        font.setColor(Color.BLACK);
+        font.draw(batch, coinText, 10, screenHeight - 10); // Draw coins at the top left
+        font.setColor(Color.YELLOW);
+        font.draw(batch, coinText, 10, screenHeight - 10); // Draw coins at the top left in yellow
         batch.end();
 
         // Handle tower placement (logic only)
@@ -153,6 +165,7 @@ public class jungleMap implements Screen {
                     // Reduce player's health/lives here
                 } else if (!enemy.isAlive()) {
                     System.out.println("Enemy defeated!");
+                    addbenumCoin(1);
                 }
                 enemyIterator.remove();
             }
@@ -191,6 +204,23 @@ public class jungleMap implements Screen {
     private void initializePath() {
         enemyPath = new JunglePath();
        
+    }
+    public int getBenumCoin() {
+        return benumCoin;
+    }
+    public void addbenumCoin(int amount) {
+        benumCoin += amount;
+        System.out.println("BenumCoin added! Current total: " + benumCoin);
+    }
+    public boolean spendBenumCoin(int amount) {
+        if (benumCoin >= amount) {
+            benumCoin -= amount;
+            System.out.println("BenumCoin spent! Current total: " + benumCoin);
+            return true; // Successfully spent
+        } else {
+            System.out.println("Not enough BenumCoin! Need " + amount + ", have " + benumCoin);
+            return false; // Not enough BenumCoin
+        }
     }
 
     @Override

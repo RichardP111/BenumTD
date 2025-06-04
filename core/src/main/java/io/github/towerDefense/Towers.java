@@ -18,6 +18,7 @@ public class Towers {
     private float attackCooldown;
     private float timeSinceLastAttack;
     private Color color;
+    private static final int COST = 50;
 
     /**
      * Constructor for the Towers class.
@@ -91,5 +92,12 @@ public class Towers {
      */
     public float getAttackDamage() {
         return attackDamage;
+    }
+    /**
+     * Gets the cost of the tower.
+     * @return The cost of the tower.
+     */
+    public static int getCost() {
+        return COST;
     }
 }
