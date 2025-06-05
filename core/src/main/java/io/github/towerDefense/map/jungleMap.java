@@ -31,6 +31,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport; 
+import com.badlogic.gdx.graphics.Texture;
 
 import io.github.towerDefense.Enemy;
 import io.github.towerDefense.Main;
@@ -71,24 +72,26 @@ public class jungleMap implements Screen {
     private Actor mapDropTargetActor; 
     private DragAndDrop.Payload currentDragPayload = null; 
 
+    private Texture enemyTexture;
+
     //tower properties
     private static final int COST_TOWER_1 = 50;
     private static final Color COLOR_TOWER_1 = Color.BLUE;
     private static final float RANGE_TOWER_1 = 150f;
     private static final float DAMAGE_TOWER_1 = 1f;
-    private static final float COOLDOWN_TOWER_1 = 1.5f;
+    private static final float COOLDOWN_TOWER_1 = 0.3f;
 
     private static final int COST_TOWER_2 = 75;
     private static final Color COLOR_TOWER_2 = Color.GREEN;
     private static final float RANGE_TOWER_2 = 170f;
     private static final float DAMAGE_TOWER_2 = 1.2f;
-    private static final float COOLDOWN_TOWER_2 = 1.3f;
+    private static final float COOLDOWN_TOWER_2 = 0.26f;
 
     private static final int COST_TOWER_3 = 100;
     private static final Color COLOR_TOWER_3 = Color.RED;
     private static final float RANGE_TOWER_3 = 200f;
     private static final float DAMAGE_TOWER_3 = 1.5f;
-    private static final float COOLDOWN_TOWER_3 = 1.0f;
+    private static final float COOLDOWN_TOWER_3 = 0.2f;
 
     private static final String TAG = "jungleMap"; 
     private static final float PATH_CLEARANCE_FROM_TOWER_EDGE = 10f; 
@@ -102,6 +105,7 @@ public class jungleMap implements Screen {
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         backgroundImage = new Texture("maps/jungleMap.jpg"); 
+        enemyTexture = new Texture("enemy.jpg");
         towers = new ArrayList<>();
         enemies = new ArrayList<>();
 
@@ -336,12 +340,12 @@ public class jungleMap implements Screen {
             tower.update(delta); 
             tower.render(shapeRenderer);
         }
-
+        batch.begin();
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
             enemy.move(delta);
-            enemy.render(shapeRenderer);
+            enemy.render(batch);
 
             for (Towers tower : towers) {
                 Vector2 towerCenter = tower.getCenter();
@@ -360,10 +364,11 @@ public class jungleMap implements Screen {
                 } else if (!enemy.isAlive()) {
                     addBenumCoin(10); 
                 }
+                enemy.dispose();
                 enemyIterator.remove();
             }
         }
-        shapeRenderer.end(); 
+        batch.end(); 
 
         waveTimer += delta;
         if (waveTimer >= TIME_BETWEEN_WAVES) {
@@ -374,7 +379,7 @@ public class jungleMap implements Screen {
                     if (startPoint != null) {
                         int enemyHealth = 3 + waveNumber;
                         float enemySpeed = 70f + waveNumber * 2f;
-                        enemies.add(new Enemy(startPoint.x, startPoint.y, enemySpeed, enemyHealth, Color.ORANGE, enemyPath));
+                        enemies.add(new Enemy(startPoint.x, startPoint.y, enemySpeed, enemyHealth, Color.ORANGE, enemyPath, batch, enemyTexture));
                         enemiesSpawnedInWave++;
                         individualEnemySpawnTimer = 0f;
                     }
@@ -391,7 +396,8 @@ public class jungleMap implements Screen {
                 }
             }
         }
-        
+        shapeRenderer.end();
+
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f)); 
         stage.draw(); 
     }
@@ -489,10 +495,12 @@ public class jungleMap implements Screen {
         if (batch != null) batch.dispose();
         if (shapeRenderer != null) shapeRenderer.dispose();
         if (backgroundImage != null) backgroundImage.dispose();
+        if(enemyTexture != null) enemyTexture.dispose();
         if (font != null) font.dispose(); 
         if (stage != null) stage.dispose();
         if (towerIconTexture1 != null) towerIconTexture1.dispose();
         if (towerIconTexture2 != null) towerIconTexture2.dispose();
         if (towerIconTexture3 != null) towerIconTexture3.dispose();
+
     }
 }

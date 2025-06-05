@@ -8,6 +8,8 @@ package io.github.towerDefense;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer; 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch; 
 import com.badlogic.gdx.math.Vector2; 
 
 import io.github.towerDefense.map.JunglePath; // import Path
@@ -19,10 +21,12 @@ public class Enemy {
     private int health;
     private Color color; // color of the enemy
     private JunglePath path; // the path the enemy follows
-    private int currentWaypointIndex; // current waypoint the enemy is moving towards
+    private int currentWaypointIndex = 0; // current waypoint the enemy is moving towards
+    private Texture enemyTexture;
+    private SpriteBatch batch; // SpriteBatch for rendering the enemy texture
 
 
-    public Enemy(float x, float y, float speed, int health, Color color, JunglePath path) {
+    public Enemy(float x, float y, float speed, int health, Color color, JunglePath path, SpriteBatch batch, Texture enemyTexture) {
         this.x = x - SIZE / 2f; 
         this.y = y - SIZE / 2f;
         this.speed = speed;
@@ -30,6 +34,8 @@ public class Enemy {
         this.color = color;
         this.path = path;
         this.currentWaypointIndex = 0; // start at the first waypoint
+        this.batch = batch;
+        this.enemyTexture = enemyTexture;
     }
 
 
@@ -60,9 +66,12 @@ public class Enemy {
     }
 
 
-    public void render(ShapeRenderer shapeRenderer) {
-        shapeRenderer.setColor(color); // Set the enemy's color
-        shapeRenderer.rect(x, y, SIZE, SIZE); // draw the enemy as a square
+    public void render(SpriteBatch batch) {
+        //shapeRenderer.setColor(color); // Set the enemy's color
+        //shapeRenderer.rect(x, y, SIZE, SIZE); // draw the enemy as a square
+        if (enemyTexture != null) {
+            batch.draw(enemyTexture, x, y, SIZE, SIZE); // draw the enemy using the texture
+        }
     }
 
 
@@ -86,5 +95,7 @@ public class Enemy {
 
     public boolean hasReachedEnd() {
         return path != null && currentWaypointIndex >= path.getNumWaypoints();
+    }
+public void dispose() {
     }
 }
