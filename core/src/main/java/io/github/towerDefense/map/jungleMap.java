@@ -258,7 +258,7 @@ public class jungleMap implements Screen {
                 dragImage.setSize(Towers.SIZE, Towers.SIZE); 
                 currentDragPayload.setDragActor(dragImage); 
                 
-                dragAndDrop.setDragActorPosition(-dragImage.getWidth() / 2f, -dragImage.getHeight() / 2f);
+                dragAndDrop.setDragActorPosition((-dragImage.getWidth()/2f+50), (-dragImage.getHeight()/2f));
                                 
                 sourceActor.getColor().a = 0.4f; 
                 return currentDragPayload;
