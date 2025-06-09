@@ -1,13 +1,17 @@
 audio/main.mp3
 audio/musicTowerSelect.mp3
 benumTowerLogo.png
+compMice.png
 effectsButton.png
+enemy.jpg
 icon.png
 maps/jungleMap.jpg
 maps/jungleMap.png
 musicButton.png
+school.png
 settings.png
 startBackground.png
+table.png
 textBasedLogo.png
 ui/default.fnt
 ui/uiskin.atlas

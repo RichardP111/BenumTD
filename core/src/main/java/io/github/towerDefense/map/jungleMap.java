@@ -31,14 +31,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport; 
-import com.badlogic.gdx.graphics.Texture;
 
 import io.github.towerDefense.Enemy;
 import io.github.towerDefense.Main;
+import io.github.towerDefense.Projectile;
 import io.github.towerDefense.TowerPlacementManager;
 import io.github.towerDefense.Towers;
-
-public class jungleMap implements Screen {
+public class JungleMap implements Screen {
     private final Main game;
 
     private Texture backgroundImage;
@@ -60,6 +59,7 @@ public class jungleMap implements Screen {
     private GlyphLayout glyphLayout;
 
     private ArrayList<Towers> towers;
+    private ArrayList<Projectile> projectiles;
     private OrthographicCamera camera; 
     private TowerPlacementManager placementManager;
 
@@ -73,6 +73,7 @@ public class jungleMap implements Screen {
     private DragAndDrop.Payload currentDragPayload = null; 
 
     private Texture enemyTexture;
+    private String projectileFileName;
 
     //tower properties
     private static final int COST_TOWER_1 = 50;
@@ -84,19 +85,18 @@ public class jungleMap implements Screen {
     private static final int COST_TOWER_2 = 75;
     private static final Color COLOR_TOWER_2 = Color.GREEN;
     private static final float RANGE_TOWER_2 = 170f;
-    private static final float DAMAGE_TOWER_2 = 1.2f;
+    private static final float DAMAGE_TOWER_2 = 1.5f;
     private static final float COOLDOWN_TOWER_2 = 0.26f;
 
     private static final int COST_TOWER_3 = 100;
     private static final Color COLOR_TOWER_3 = Color.RED;
     private static final float RANGE_TOWER_3 = 200f;
-    private static final float DAMAGE_TOWER_3 = 1.5f;
+    private static final float DAMAGE_TOWER_3 = 2f;
     private static final float COOLDOWN_TOWER_3 = 0.2f;
 
-    private static final String TAG = "jungleMap"; 
     private static final float PATH_CLEARANCE_FROM_TOWER_EDGE = 10f; 
 
-    public jungleMap(Main game) {
+    public JungleMap(Main game) {
         this.game = game;
     }
 
@@ -108,6 +108,7 @@ public class jungleMap implements Screen {
         enemyTexture = new Texture("enemy.jpg");
         towers = new ArrayList<>();
         enemies = new ArrayList<>();
+        projectiles = new ArrayList<>();
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -168,6 +169,7 @@ public class jungleMap implements Screen {
         addDragAndDropSource(towerDraggableImage3, "TowerType3", towerIconTexture3);
         
         dragAndDrop.addTarget(new DragAndDrop.Target(mapDropTargetActor) { 
+            @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 Vector3 mouseScreenCoords = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
                 Vector3 worldCoordinates = camera.unproject(mouseScreenCoords.cpy()); 
@@ -192,12 +194,14 @@ public class jungleMap implements Screen {
                 return true; 
             }
 
+            @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
                 if (payload.getDragActor() != null) {
                     payload.getDragActor().setColor(Color.WHITE); 
                 }
             }
 
+            @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 Vector3 worldCoordinates = camera.unproject(new Vector3(x, Gdx.graphics.getHeight()-y, 0)); 
 
@@ -207,12 +211,30 @@ public class jungleMap implements Screen {
                 Color towerColor = Color.WHITE; 
                 float attackRange = 0, attackDamage = 0, attackCooldown = 0;
 
-                if ("TowerType1".equals(towerTypeString)) {
-                    towerColor = COLOR_TOWER_1; attackRange = RANGE_TOWER_1; attackDamage = DAMAGE_TOWER_1; attackCooldown = COOLDOWN_TOWER_1;
-                } else if ("TowerType2".equals(towerTypeString)) {
-                    towerColor = COLOR_TOWER_2; attackRange = RANGE_TOWER_2; attackDamage = DAMAGE_TOWER_2; attackCooldown = COOLDOWN_TOWER_2;
-                } else if ("TowerType3".equals(towerTypeString)) {
-                    towerColor = COLOR_TOWER_3; attackRange = RANGE_TOWER_3; attackDamage = DAMAGE_TOWER_3; attackCooldown = COOLDOWN_TOWER_3;
+                switch (towerTypeString) {
+                    case "TowerType1":
+                        projectileFileName = "compMice.png";
+                        towerColor = COLOR_TOWER_1;
+                        attackRange = RANGE_TOWER_1;
+                        attackDamage = DAMAGE_TOWER_1;
+                        attackCooldown = COOLDOWN_TOWER_1;
+                        break;
+                    case "TowerType2":
+                        projectileFileName = "table.png";
+                        towerColor = COLOR_TOWER_2;
+                        attackRange = RANGE_TOWER_2;
+                        attackDamage = DAMAGE_TOWER_2;
+                        attackCooldown = COOLDOWN_TOWER_2;
+                        break;
+                    case "TowerType3":
+                        projectileFileName = "school.png";
+                        towerColor = COLOR_TOWER_3;
+                        attackRange = RANGE_TOWER_3;
+                        attackDamage = DAMAGE_TOWER_3;
+                        attackCooldown = COOLDOWN_TOWER_3;
+                        break;
+                    default:
+                        break;
                 }
 
                 float placeX = worldCoordinates.x - Towers.SIZE / 2f;
@@ -226,8 +248,7 @@ public class jungleMap implements Screen {
 
                 if (canAfford && !overlaps && !nearPath) {
                     if (spendBenumCoin(towerCost)) {
-                        Towers newTower = new Towers(placeX, placeY, attackRange, attackDamage, attackCooldown, towerColor);
-                        towers.add(newTower);
+                        towers.add(new Towers(placeX, placeY, attackRange, attackDamage, attackCooldown, towerColor, projectileFileName));
                     }
                 } else {
                     
@@ -250,6 +271,7 @@ public class jungleMap implements Screen {
 
     private void addDragAndDropSource(final Image sourceActor, final String towerType, Texture dragActorTexture) {
         dragAndDrop.addSource(new DragAndDrop.Source(sourceActor) {
+            @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 currentDragPayload = new DragAndDrop.Payload(); 
                 currentDragPayload.setObject(towerType); 
@@ -336,38 +358,43 @@ public class jungleMap implements Screen {
         shapeRenderer.setProjectionMatrix(camera.combined); 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled); 
 
+        // Update and Render Towers
         for (Towers tower : towers) {
-            tower.update(delta); 
+            tower.update(delta, enemies, projectiles, batch);
             tower.render(shapeRenderer);
         }
-        batch.begin();
+        shapeRenderer.end();
+
+        batch.begin(); 
+        Iterator<Projectile> projectileIterator = projectiles.iterator();
+        while (projectileIterator.hasNext()) {
+            Projectile projectile = projectileIterator.next();
+            projectile.update(delta); 
+
+            if (!projectile.isActive()) {
+                projectileIterator.remove();
+            } else {
+                projectile.render(batch);
+            }
+        }
+
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
-            enemy.move(delta);
-            enemy.render(batch);
-
-            for (Towers tower : towers) {
-                Vector2 towerCenter = tower.getCenter();
-                Vector2 enemyCenter = new Vector2(enemy.x + Enemy.SIZE / 2f, enemy.y + Enemy.SIZE / 2f);
-                float distance = towerCenter.dst(enemyCenter);
-
-                if (distance <= tower.getAttackRange()) {
-                    if (tower.canAttack()) {
-                        enemy.takeDamage((int) tower.getAttackDamage());
-                    }
-                }
-            }
+            enemy.move(delta); 
+            enemy.render(batch); 
 
             if (!enemy.isAlive() || enemy.hasReachedEnd()) {
                 if (enemy.hasReachedEnd()) {
+                    
                 } else if (!enemy.isAlive()) {
                     addBenumCoin(10); 
+                    enemy.dispose();
+                    enemyIterator.remove(); 
                 }
-                enemy.dispose();
-                enemyIterator.remove();
             }
         }
+
         batch.end(); 
 
         waveTimer += delta;
@@ -384,6 +411,7 @@ public class jungleMap implements Screen {
                         individualEnemySpawnTimer = 0f;
                     }
                 }
+
             } else if (enemies.isEmpty()) { 
                 if (waveNumber < MAX_WAVES) {
                     waveNumber++;

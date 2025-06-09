@@ -1,182 +1,183 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-05-30
+ * Last modified: 2025-06-04
  * This file is part of Rise of Benum Tower Defense.
- * City map class for the game.
- * This class will handle the city map layout and logic.
+ * Classroom map class for the game.
+ * COPY
  */
-
 package io.github.towerDefense.map;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20; 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch; 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
 import io.github.towerDefense.Enemy;
-import io.github.towerDefense.Main; 
+import io.github.towerDefense.Main;
+import io.github.towerDefense.TowerPlacementManager;
+import io.github.towerDefense.Towers;
 
 public class classMap implements Screen {
     private final Main game;
 
     private Texture backgroundImage;
     private SpriteBatch batch;
-    private ShapeRenderer shapeRenderer; 
-    private ArrayList<Enemy> enemies; 
-    private JunglePath enemyPath; //path for enemies to follow
+    private ShapeRenderer shapeRenderer;
+    private ArrayList<Enemy> enemies;
+    private JunglePath enemyPath;
 
     private float waveTimer;
-    private final float TIME_BETWEEN_WAVES = 5f; 
+    private final float TIME_BETWEEN_WAVES = 5f;
     private int waveNumber;
+    private final int MAX_WAVES = 40;
     private int enemiesPerWave;
     private int enemiesSpawnedInWave;
-    private float enemySpawnIntervalInWave; //time between each spawn 
+    private float enemySpawnIntervalInWave;
     private float individualEnemySpawnTimer;
+
+    private BitmapFont font;
+    private GlyphLayout glyphLayout;
+
+    private ArrayList<Towers> towers;
+    private OrthographicCamera camera; 
+    private TowerPlacementManager placementManager;
+
+    private int benumCoin;
+
+    private Stage stage; 
+    private DragAndDrop dragAndDrop;
+    private Texture towerIconTexture1, towerIconTexture2, towerIconTexture3;
+    private Image towerDraggableImage1, towerDraggableImage2, towerDraggableImage3;
+    private Actor mapDropTargetActor; 
+    private DragAndDrop.Payload currentDragPayload = null; 
+
+    private Texture enemyTexture;
+
+    //tower properties
+    private static final int COST_TOWER_1 = 50;
+    private static final Color COLOR_TOWER_1 = Color.BLUE;
+    private static final float RANGE_TOWER_1 = 150f;
+    private static final float DAMAGE_TOWER_1 = 1f;
+    private static final float COOLDOWN_TOWER_1 = 0.3f;
+
+    private static final int COST_TOWER_2 = 75;
+    private static final Color COLOR_TOWER_2 = Color.GREEN;
+    private static final float RANGE_TOWER_2 = 170f;
+    private static final float DAMAGE_TOWER_2 = 1.2f;
+    private static final float COOLDOWN_TOWER_2 = 0.26f;
+
+    private static final int COST_TOWER_3 = 100;
+    private static final Color COLOR_TOWER_3 = Color.RED;
+    private static final float RANGE_TOWER_3 = 200f;
+    private static final float DAMAGE_TOWER_3 = 1.5f;
+    private static final float COOLDOWN_TOWER_3 = 0.2f;
+
+    private static final float PATH_CLEARANCE_FROM_TOWER_EDGE = 10f; 
 
     public classMap(Main game) {
         this.game = game;
     }
 
     @Override
-    public void show() {
-        batch = new SpriteBatch();
-        shapeRenderer = new ShapeRenderer();
-        backgroundImage = new Texture("maps/jungleMap.png"); //map of jungle
-        enemies = new ArrayList<>();
-        
-        initializePath(); //start the path for enemies
-
-        waveTimer = TIME_BETWEEN_WAVES; 
-        waveNumber = 0;
-        enemiesPerWave = 5; //how many enemies in each wave
-        enemySpawnIntervalInWave = 1f; //time between each enemy spawn in a wave
-        individualEnemySpawnTimer = 0f;
-    }
-
-private void initializePath() {
-    enemyPath = new JunglePath();
-
-    float w = Gdx.graphics.getWidth();
-    float h = Gdx.graphics.getHeight();
-
-    enemyPath.addWaypoint(w * 1.00f, h * 0.87f);
-    enemyPath.addWaypoint(w * 0.82f, h * 0.87f);
-    enemyPath.addWaypoint(w * 0.82f, h * 0.66f);
-    enemyPath.addWaypoint(w * 0.84f, h * 0.65f); 
-    enemyPath.addWaypoint(w * 0.86f, h * 0.64f);
-    enemyPath.addWaypoint(w * 0.88f, h * 0.61f);
-    enemyPath.addWaypoint(w * 0.91f, h * 0.59f);
-    enemyPath.addWaypoint(w * 0.92f, h * 0.57f);
-    enemyPath.addWaypoint(w * 0.95f, h * 0.50f);
-    enemyPath.addWaypoint(w * 0.95f, h * 0.40f);
-    enemyPath.addWaypoint(w * 0.95f, h * 0.38f);
-    enemyPath.addWaypoint(w * 0.94f, h * 0.35f);
-    enemyPath.addWaypoint(w * 0.92f, h * 0.30f);
-    enemyPath.addWaypoint(w * 0.87f, h * 0.25f);
-    enemyPath.addWaypoint(w * 0.84f, h * 0.23f);
-    enemyPath.addWaypoint(w * 0.78f, h * 0.20f);
-    enemyPath.addWaypoint(w * 0.70f, h * 0.20f);
-    enemyPath.addWaypoint(w * 0.65f, h * 0.22f);
-    enemyPath.addWaypoint(w * 0.62f, h * 0.27f);
-    enemyPath.addWaypoint(w * 0.58f, h * 0.34f);
-    enemyPath.addWaypoint(w * 0.58f, h * 0.53f);
-    enemyPath.addWaypoint(w * 0.58f, h * 0.53f);
-    enemyPath.addWaypoint(w * 0.61f, h * 0.58f);
-    enemyPath.addWaypoint(w * 0.66f, h * 0.63f);
-    enemyPath.addWaypoint(w * 0.70f, h * 0.67f);
-    enemyPath.addWaypoint(w * 0.70f, h * 0.87f);
-    enemyPath.addWaypoint(w * 0.65f, h * 0.87f);
-    enemyPath.addWaypoint(w * 0.57f, h * 0.70f);
-    enemyPath.addWaypoint(w * 0.50f, h * 0.50f);
-    enemyPath.addWaypoint(w * 0.42f, h * 0.30f);
-    enemyPath.addWaypoint(w * 0.35f, h * 0.20f);
-    enemyPath.addWaypoint(w * 0.31f, h * 0.20f);
-    enemyPath.addWaypoint(w * 0.31f, h * 0.40f);
-    enemyPath.addWaypoint(w * 0.38f, h * 0.45f);
-    enemyPath.addWaypoint(w * 0.41f, h * 0.49f);
-    enemyPath.addWaypoint(w * 0.43f, h * 0.52f);
-    enemyPath.addWaypoint(w * 0.45f, h * 0.65f);
-    enemyPath.addWaypoint(w * 0.42f, h * 0.75f);
-    enemyPath.addWaypoint(w * 0.39f, h * 0.83f);
-    enemyPath.addWaypoint(w * 0.36f, h * 0.85f);
-    enemyPath.addWaypoint(w * 0.30f, h * 0.87f);
-    enemyPath.addWaypoint(w * 0.22f, h * 0.87f);
-    enemyPath.addWaypoint(w * 0.18f, h * 0.84f);
-    enemyPath.addWaypoint(w * 0.12f, h * 0.79f);
-    enemyPath.addWaypoint(w * 0.10f, h * 0.75f);
-    enemyPath.addWaypoint(w * 0.07f, h * 0.70f);
-    enemyPath.addWaypoint(w * 0.07f, h * 0.57f);
-    enemyPath.addWaypoint(w * 0.10f, h * 0.50f);
-    enemyPath.addWaypoint(w * 0.15f, h * 0.45f);
-    enemyPath.addWaypoint(w * 0.20f, h * 0.40f);
-    enemyPath.addWaypoint(w * 0.20f, h * 0.20f);
-    enemyPath.addWaypoint(w * 0.00f, h * 0.20f);
-}
+    public void show() {}
 
     @Override
-    public void render(float delta) {
-        int screenWidth = Gdx.graphics.getWidth();
-        int screenHeight = Gdx.graphics.getHeight();
+    public void resize(int width, int height) {
+        camera.setToOrtho(false, width, height); 
+        stage.getViewport().update(width, height, true); 
 
-        batch.begin();
-        batch.draw(backgroundImage, 0, 0, screenWidth, screenHeight);
-        batch.end();
-
-        //update and render enemies
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        Iterator<Enemy> enemyIterator = enemies.iterator();
-        while (enemyIterator.hasNext()) {
-            Enemy enemy = enemyIterator.next();
-            enemy.move(delta);
-            enemy.render(shapeRenderer);
-
-            //remove enemy if it's no longer alive or has reached the end of the path
-            if (!enemy.isAlive() || enemy.hasReachedEnd()) {
-                if(enemy.hasReachedEnd()){
-                    //reduce player health in future 
-                }
-                enemyIterator.remove();
-            }
+        if (mapDropTargetActor != null) {
+            mapDropTargetActor.setBounds(0, 0, width, height);
         }
-        shapeRenderer.end();
 
-        //wave management
-        waveTimer += delta;
-        if (waveTimer >= TIME_BETWEEN_WAVES) {
-            if (enemiesSpawnedInWave < enemiesPerWave) {
-                individualEnemySpawnTimer += delta;
-                if (individualEnemySpawnTimer >= enemySpawnIntervalInWave) {
-                    Vector2 startPoint = enemyPath.getWaypoint(0);
-                    if (startPoint != null) {
-                        enemies.add(new Enemy(startPoint.x, startPoint.y, 70f, 3, Color.RED, enemyPath));
-                        enemiesSpawnedInWave++;
-                        individualEnemySpawnTimer = 0f;
-                    }
-                }
-            } else if (enemies.isEmpty()) {
-                waveNumber++;
-                enemiesPerWave += 2; //icrease enemies for the next wave
-                enemySpawnIntervalInWave = Math.max(0.2f, enemySpawnIntervalInWave - 0.1f); // Make spawns faster
-                enemiesSpawnedInWave = 0;
-                waveTimer = 0f; //reset timer
-            }
-        }
+        enemyPath = new JunglePath(); 
+        enemyPath.addWaypoint(width * 1.00f, height * 0.87f);
+        enemyPath.addWaypoint(width * 0.82f, height * 0.87f);
+        enemyPath.addWaypoint(width * 0.82f, height * 0.66f);
+        enemyPath.addWaypoint(width * 0.84f, height * 0.65f);
+        enemyPath.addWaypoint(width * 0.86f, height * 0.64f);
+        enemyPath.addWaypoint(width * 0.88f, height * 0.61f);
+        enemyPath.addWaypoint(width * 0.91f, height * 0.59f);
+        enemyPath.addWaypoint(width * 0.92f, height * 0.57f);
+        enemyPath.addWaypoint(width * 0.95f, height * 0.50f);
+        enemyPath.addWaypoint(width * 0.95f, height * 0.40f);
+        enemyPath.addWaypoint(width * 0.95f, height * 0.38f);
+        enemyPath.addWaypoint(width * 0.94f, height * 0.35f);
+        enemyPath.addWaypoint(width * 0.92f, height * 0.30f);
+        enemyPath.addWaypoint(width * 0.87f, height * 0.25f);
+        enemyPath.addWaypoint(width * 0.84f, height * 0.23f);
+        enemyPath.addWaypoint(width * 0.78f, height * 0.20f);
+        enemyPath.addWaypoint(width * 0.70f, height * 0.20f);
+        enemyPath.addWaypoint(width * 0.65f, height * 0.22f);
+        enemyPath.addWaypoint(width * 0.62f, height * 0.27f);
+        enemyPath.addWaypoint(width * 0.58f, height * 0.34f);
+        enemyPath.addWaypoint(width * 0.58f, height * 0.53f);
+        enemyPath.addWaypoint(width * 0.61f, height * 0.58f);
+        enemyPath.addWaypoint(width * 0.66f, height * 0.63f);
+        enemyPath.addWaypoint(width * 0.70f, height * 0.67f);
+        enemyPath.addWaypoint(width * 0.70f, height * 0.87f);
+        enemyPath.addWaypoint(width * 0.65f, height * 0.87f);
+        enemyPath.addWaypoint(width * 0.57f, height * 0.70f);
+        enemyPath.addWaypoint(width * 0.50f, height * 0.50f);
+        enemyPath.addWaypoint(width * 0.42f, height * 0.30f);
+        enemyPath.addWaypoint(width * 0.35f, height * 0.20f);
+        enemyPath.addWaypoint(width * 0.31f, height * 0.20f);
+        enemyPath.addWaypoint(width * 0.31f, height * 0.40f);
+        enemyPath.addWaypoint(width * 0.38f, height * 0.45f);
+        enemyPath.addWaypoint(width * 0.41f, height * 0.49f);
+        enemyPath.addWaypoint(width * 0.43f, height * 0.52f);
+        enemyPath.addWaypoint(width * 0.45f, height * 0.65f);
+        enemyPath.addWaypoint(width * 0.42f, height * 0.75f);
+        enemyPath.addWaypoint(width * 0.39f, height * 0.83f);
+        enemyPath.addWaypoint(width * 0.36f, height * 0.85f);
+        enemyPath.addWaypoint(width * 0.30f, height * 0.87f);
+        enemyPath.addWaypoint(width * 0.22f, height * 0.87f);
+        enemyPath.addWaypoint(width * 0.18f, height * 0.84f);
+        enemyPath.addWaypoint(width * 0.12f, height * 0.79f);
+        enemyPath.addWaypoint(width * 0.10f, height * 0.75f);
+        enemyPath.addWaypoint(width * 0.07f, height * 0.70f);
+        enemyPath.addWaypoint(width * 0.07f, height * 0.57f);
+        enemyPath.addWaypoint(width * 0.10f, height * 0.50f);
+        enemyPath.addWaypoint(width * 0.15f, height * 0.45f);
+        enemyPath.addWaypoint(width * 0.20f, height * 0.40f);
+        enemyPath.addWaypoint(width * 0.20f, height * 0.20f);
+        enemyPath.addWaypoint(width * 0.00f, height * 0.20f); 
     }
 
-    @Override public void resize(int width, int height) {}
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}
 
-    @Override public void dispose() {
-        batch.dispose();
-        backgroundImage.dispose();
-        shapeRenderer.dispose(); //dispose ShapeRenderer
+    @Override
+    public void render(float delta) {
+
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
+
+    @Override
+    public void dispose() {
+        if (batch != null) batch.dispose();
+        if (shapeRenderer != null) shapeRenderer.dispose();
+        if (backgroundImage != null) backgroundImage.dispose();
+        if(enemyTexture != null) enemyTexture.dispose();
+        if (font != null) font.dispose(); 
+        if (stage != null) stage.dispose();
+        if (towerIconTexture1 != null) towerIconTexture1.dispose();
+        if (towerIconTexture2 != null) towerIconTexture2.dispose();
+        if (towerIconTexture3 != null) towerIconTexture3.dispose();
+
     }
 }

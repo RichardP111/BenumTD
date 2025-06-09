@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class splashScreen implements Screen {
+public class SplashScreen implements Screen {
     private final Main game;
     private SpriteBatch batch;
     private Texture image;
@@ -20,7 +20,7 @@ public class splashScreen implements Screen {
     private enum State { FADE_IN, HOLD, FADE_OUT }
     private State state = State.FADE_IN;
 
-    public splashScreen(Main game) {
+    public SplashScreen(Main game) {
         this.game = game;
     }
 
@@ -55,7 +55,7 @@ public class splashScreen implements Screen {
                 alpha -= delta / 1f; // Fade out over 1s
                 if (alpha <= 0f) {
                     alpha = 0f;
-                    game.setScreen(new startScreen(game)); // switch screen here
+                    game.setScreen(new StartScreen(game)); // switch screen here
                     dispose();
                     return;
                 }

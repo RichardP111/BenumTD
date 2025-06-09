@@ -23,7 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 
-public class settingsScreen implements Screen { 
+public class SettingsScreen implements Screen { 
     private final Main game;
     private SpriteBatch batch;
     private Texture backgroundImage;
@@ -40,7 +40,7 @@ public class settingsScreen implements Screen {
     public static boolean effectEnabled = true; 
     public static boolean musicEnabled = true; 
 
-    public settingsScreen(Main game) {
+    public SettingsScreen(Main game) {
         this.game = game;
     }
 
@@ -67,7 +67,7 @@ public class settingsScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mainSound.stop();
-                game.setScreen(new startScreen(game));
+                game.setScreen(new StartScreen(game));
             }
         });
 

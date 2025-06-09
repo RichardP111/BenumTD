@@ -22,10 +22,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import io.github.towerDefense.map.jungleMap;
+import io.github.towerDefense.map.JungleMap;
 
 
-public class startScreen implements Screen { 
+public class StartScreen implements Screen { 
     private final Main game;
     private SpriteBatch batch;
     private Texture backgroundImage;
@@ -38,7 +38,7 @@ public class startScreen implements Screen {
     private Sound mainSound;
     private long mainID;
 
-    public startScreen(Main game) {
+    public StartScreen(Main game) {
         this.game = game;
     }
 
@@ -51,7 +51,7 @@ public class startScreen implements Screen {
 
         // Start music
         mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
-        if (settingsScreen.musicEnabled) {
+        if (SettingsScreen.musicEnabled) {
             mainID = mainSound.play(1.0f);
             mainSound.setLooping(mainID, true);
         }
@@ -73,7 +73,7 @@ public class startScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mainSound.stop();
-                game.setScreen(new jungleMap(game));
+                game.setScreen(new JungleMap(game));
             }
         });
 
@@ -99,7 +99,7 @@ public class startScreen implements Screen {
         settingsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new settingsScreen(game));
+                game.setScreen(new SettingsScreen(game));
             }
         });
 

@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;  
 
+import io.github.towerDefense.map.JungleMap;
 import io.github.towerDefense.map.JunglePath;
-import io.github.towerDefense.map.jungleMap;
 
 public class TowerPlacementManager {
-    private ArrayList<Towers> towers; 
-    private jungleMap gameMap; 
+    private final ArrayList<Towers> towers; 
+    private JungleMap gameMap; 
 
-    public TowerPlacementManager(ArrayList<Towers> towers, jungleMap gameMap) {
+    public TowerPlacementManager(ArrayList<Towers> towers, JungleMap gameMap) {
         this.towers = towers;
         this.gameMap = gameMap;
     }
