@@ -14,6 +14,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20; 
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -35,6 +36,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.github.towerDefense.Enemy;
 import io.github.towerDefense.Main;
 import io.github.towerDefense.Projectile;
+import io.github.towerDefense.SettingsScreen;
 import io.github.towerDefense.TowerPlacementManager;
 import io.github.towerDefense.Towers;
 public class JungleMap implements Screen {
@@ -45,6 +47,14 @@ public class JungleMap implements Screen {
     private ShapeRenderer shapeRenderer;
     private ArrayList<Enemy> enemies;
     private JunglePath enemyPath;
+
+    private Sound mainSound;
+    private long mainID;
+    private Sound towerPlaceSound;
+    private Sound buttonClickSound; 
+    private Sound newRoundSound;
+    private Sound gameOverSound;
+    private Sound gameWinSound;
 
     private float waveTimer;
     private final float TIME_BETWEEN_WAVES = 5f;
@@ -115,7 +125,7 @@ public class JungleMap implements Screen {
 
         benumCoin = 200; 
         placementManager = new TowerPlacementManager(towers, this); 
-        initializePath();
+        enemyPath = new JunglePath();
 
         waveTimer = TIME_BETWEEN_WAVES; 
         waveNumber = 1;
@@ -126,7 +136,19 @@ public class JungleMap implements Screen {
 
         font = new BitmapFont(); 
         glyphLayout = new GlyphLayout();
-        
+
+        mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
+        if (SettingsScreen.musicEnabled) {
+            mainID = mainSound.play(1.0f);
+            mainSound.setLooping(mainID, true);
+        }
+
+        towerPlaceSound = Gdx.audio.newSound(Gdx.files.internal("audio/towerPlace.wav"));
+        buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("audio/buttonClick.wav"));
+        newRoundSound = Gdx.audio.newSound(Gdx.files.internal("audio/newRound.wav"));
+        gameWinSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameWin.wav"));
+        gameOverSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameOver.wav"));
+
         stage = new Stage(new ScreenViewport()); 
         dragAndDrop = new DragAndDrop();
 
@@ -249,9 +271,10 @@ public class JungleMap implements Screen {
                 if (canAfford && !overlaps && !nearPath) {
                     if (spendBenumCoin(towerCost)) {
                         towers.add(new Towers(placeX, placeY, attackRange, attackDamage, attackCooldown, towerColor, projectileFileName));
+                        if (SettingsScreen.effectEnabled){
+                            towerPlaceSound.play(1f);
+                        }
                     }
-                } else {
-                    
                 }
             }
         });
@@ -349,7 +372,6 @@ public class JungleMap implements Screen {
                 shapeRenderer.setColor(1, 0, 0, 0.3f); 
             }
 
-
             shapeRenderer.circle(potentialTowerCenterX, potentialTowerCenterY, Towers.SIZE * 2f);
             shapeRenderer.end();
             Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -386,7 +408,7 @@ public class JungleMap implements Screen {
 
             if (!enemy.isAlive() || enemy.hasReachedEnd()) {
                 if (enemy.hasReachedEnd()) {
-                    
+                    //lose life
                 } else if (!enemy.isAlive()) {
                     addBenumCoin(10); 
                     enemy.dispose();
@@ -419,8 +441,14 @@ public class JungleMap implements Screen {
                     enemySpawnIntervalInWave = Math.max(0.1f, enemySpawnIntervalInWave - 0.05f); 
                     enemiesSpawnedInWave = 0;
                     waveTimer = 0f; 
+                    if (SettingsScreen.effectEnabled){
+                        newRoundSound.play(1f);
+                    }
                 } else {
                     //end game
+                    if (SettingsScreen.effectEnabled){
+                        gameWinSound.play(1f);
+                    }
                 }
             }
         }
@@ -428,10 +456,6 @@ public class JungleMap implements Screen {
 
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f)); 
         stage.draw(); 
-    }
-
-    private void initializePath() {
-        enemyPath = new JunglePath();
     }
 
     public int getBenumCoin() {
@@ -523,7 +547,7 @@ public class JungleMap implements Screen {
         if (batch != null) batch.dispose();
         if (shapeRenderer != null) shapeRenderer.dispose();
         if (backgroundImage != null) backgroundImage.dispose();
-        if(enemyTexture != null) enemyTexture.dispose();
+        if (enemyTexture != null) enemyTexture.dispose();
         if (font != null) font.dispose(); 
         if (stage != null) stage.dispose();
         if (towerIconTexture1 != null) towerIconTexture1.dispose();

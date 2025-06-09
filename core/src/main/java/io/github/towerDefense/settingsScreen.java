@@ -36,6 +36,7 @@ public class SettingsScreen implements Screen {
 
     private Sound mainSound;
     private long mainID;
+    private Sound buttonClickSound;
 
     public static boolean effectEnabled = true; 
     public static boolean musicEnabled = true; 
@@ -49,6 +50,7 @@ public class SettingsScreen implements Screen {
         batch = new SpriteBatch();
         backgroundImage = new Texture("startBackground.png");
         mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
+        buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("audio/buttonClick.wav"));
 
         // Stage and input
         stage = new Stage(new ScreenViewport());
@@ -66,7 +68,9 @@ public class SettingsScreen implements Screen {
         startButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                mainSound.stop();
+                if (effectEnabled){
+                    buttonClickSound.play(1f);
+                }
                 game.setScreen(new StartScreen(game));
             }
         });
@@ -84,9 +88,7 @@ public class SettingsScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 effectEnabled = !effectEnabled; 
                 if (effectEnabled) {
-                    Gdx.app.log("Settings", "Effects Enabled");
-                } else {
-                    Gdx.app.log("Settings", "Effects Disabled");
+                    buttonClickSound.play(1f); 
                 }
             }
         });
@@ -97,16 +99,17 @@ public class SettingsScreen implements Screen {
         musicButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                musicEnabled = !musicEnabled; // Toggle music state
+                musicEnabled = !musicEnabled;
                 if (musicEnabled) {
                     mainID = mainSound.play(1.0f);
                     mainSound.setLooping(mainID, true);
-                    Gdx.app.log("Settings", "Music Enabled");
                 } else {
                     if (mainSound != null) {
                         mainSound.stop(mainID);
                     }
-                    Gdx.app.log("Settings", "Music Disabled");
+                }
+                if (effectEnabled){
+                    buttonClickSound.play(1f);
                 }
             }
         });

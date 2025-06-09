@@ -37,6 +37,7 @@ public class StartScreen implements Screen {
 
     private Sound mainSound;
     private long mainID;
+    private Sound buttonClickSound;
 
     public StartScreen(Main game) {
         this.game = game;
@@ -50,11 +51,13 @@ public class StartScreen implements Screen {
         settingsImage = new Texture("settings.png");
 
         // Start music
-        mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
+        mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/startMusic.mp3"));
         if (SettingsScreen.musicEnabled) {
             mainID = mainSound.play(1.0f);
             mainSound.setLooping(mainID, true);
         }
+
+        buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("audio/buttonClick.wav"));
 
         // Stage and input
         stage = new Stage(new ScreenViewport());
@@ -73,6 +76,9 @@ public class StartScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mainSound.stop();
+                if (SettingsScreen.effectEnabled){
+                    buttonClickSound.play(1f);
+                }
                 game.setScreen(new JungleMap(game));
             }
         });
@@ -82,6 +88,9 @@ public class StartScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mainSound.stop();
+                if (SettingsScreen.effectEnabled){
+                    buttonClickSound.play(1f);
+                }
                 game.setScreen(new Tutorial(game));
             }
         });
@@ -99,6 +108,9 @@ public class StartScreen implements Screen {
         settingsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (SettingsScreen.effectEnabled){
+                    buttonClickSound.play(1f);
+                }
                 game.setScreen(new SettingsScreen(game));
             }
         });

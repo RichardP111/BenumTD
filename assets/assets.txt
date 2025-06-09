@@ -1,5 +1,11 @@
+audio/buttonClick.wav
+audio/gameOver.wav
+audio/gameWin.wav
 audio/main.mp3
 audio/musicTowerSelect.mp3
+audio/newRound.wav
+audio/startMusic.mp3
+audio/towerPlace.wav
 benumTowerLogo.png
 compMice.png
 effectsButton.png
