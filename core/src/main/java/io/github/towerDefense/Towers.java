@@ -120,7 +120,7 @@ public class Towers {
     private void shootProjectile(ArrayList<Projectile> projectiles, SpriteBatch batch) { 
         if (currentTarget != null && currentTarget.isAlive() && isInRange(currentTarget)) {
             Vector2 towerCenter = getCenter();
-            projectiles.add(new Projectile(towerCenter.x, towerCenter.y, currentTarget, 100f, (int)attackDamage, this.projectileTextureFileName, batch)); 
+            projectiles.add(new Projectile(towerCenter.x, towerCenter.y, currentTarget, 500f, (int)attackDamage, this.projectileTextureFileName, batch)); 
         }
     }
 

@@ -16,7 +16,7 @@ public class Projectile {
     private Texture projectileTexture;
     private final Sprite projectileSprite;
 
-    public static final float SIZE = 15f; // Adjust this value to make your mouse image bigger/smaller
+    public static final float SIZE = 50f;
 
 public Projectile(float x, float y, Enemy target, float speed, int damage, String textureFileName, SpriteBatch batch) {        
         this.position = new Vector2(x, y);

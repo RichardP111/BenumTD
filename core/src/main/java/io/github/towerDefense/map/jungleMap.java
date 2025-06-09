@@ -55,6 +55,7 @@ public class JungleMap implements Screen {
     private Sound newRoundSound;
     private Sound gameOverSound;
     private Sound gameWinSound;
+    private Sound enemyDeathSound;
 
     private float waveTimer;
     private final float TIME_BETWEEN_WAVES = 5f;
@@ -148,6 +149,7 @@ public class JungleMap implements Screen {
         newRoundSound = Gdx.audio.newSound(Gdx.files.internal("audio/newRound.wav"));
         gameWinSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameWin.wav"));
         gameOverSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameOver.wav"));
+        enemyDeathSound = Gdx.audio.newSound(Gdx.files.internal("audio/jeffDie.mp3"));
 
         stage = new Stage(new ScreenViewport()); 
         dragAndDrop = new DragAndDrop();
@@ -411,6 +413,9 @@ public class JungleMap implements Screen {
                     //lose life
                 } else if (!enemy.isAlive()) {
                     addBenumCoin(10); 
+                    if (SettingsScreen.effectEnabled){
+                        enemyDeathSound.play(1f);
+                    }
                     enemy.dispose();
                     enemyIterator.remove(); 
                 }
