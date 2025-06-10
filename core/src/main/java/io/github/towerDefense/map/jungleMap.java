@@ -144,7 +144,7 @@ public class JungleMap implements Screen {
             mainSound.setLooping(mainID, true);
         }
 
-        towerPlaceSound = Gdx.audio.newSound(Gdx.files.internal("audio/towerPlace.wav"));
+        towerPlaceSound = Gdx.audio.newSound(Gdx.files.internal("audio/towerPlace.mp3"));
         buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("audio/buttonClick.wav"));
         newRoundSound = Gdx.audio.newSound(Gdx.files.internal("audio/newRound.wav"));
         gameWinSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameWin.wav"));
@@ -274,7 +274,7 @@ public class JungleMap implements Screen {
                     if (spendBenumCoin(towerCost)) {
                         towers.add(new Towers(placeX, placeY, attackRange, attackDamage, attackCooldown, towerColor, projectileFileName));
                         if (SettingsScreen.effectEnabled){
-                            towerPlaceSound.play(1f);
+                            towerPlaceSound.play(500f);
                         }
                     }
                 }

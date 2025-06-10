@@ -29,7 +29,11 @@ public class SettingsScreen implements Screen {
     private Texture backgroundImage;
     private Texture effectImage;
     private Texture musicImage;
-    
+    private Texture musicMute;
+    private Texture effectMute;
+
+    private ImageButton musicButton;
+    private ImageButton effectButton;
 
     private Stage stage;
     private Skin skin;
@@ -45,84 +49,95 @@ public class SettingsScreen implements Screen {
         this.game = game;
     }
 
-    @Override
-    public void show() {
-        batch = new SpriteBatch();
-        backgroundImage = new Texture("startBackground.png");
-        mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
-        buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("audio/buttonClick.wav"));
+@Override
+public void show() {
+    batch = new SpriteBatch();
+    backgroundImage = new Texture("startBackground.png");
+    mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
+    buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("audio/buttonClick.wav"));
 
-        // Stage and input
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
+    stage = new Stage(new ScreenViewport());
+    Gdx.input.setInputProcessor(stage);
 
-        // Skin
-        skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+    skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
-        // Layout table for buttons
-        Table table = new Table();
-        table.setFillParent(true);
-        table.center(); // Center everything
+    Table table = new Table();
+    table.setFillParent(true);
+    table.center(); 
 
-        TextButton startButton = new TextButton("Back", skin);
-        startButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (effectEnabled){
-                    buttonClickSound.play(1f);
-                }
-                game.setScreen(new StartScreen(game));
+    TextButton startButton = new TextButton("Back", skin);
+    startButton.addListener(new ClickListener() {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            if (effectEnabled){
+                buttonClickSound.play(1f);
             }
-        });
+            mainSound.stop();
+            game.setScreen(new StartScreen(game));
+        }
+    });
 
-        table.add().height(600); // Spacer
-        table.row();
-        table.add(startButton).width(200).height(50).pad(10);
-        stage.addActor(table);
+    table.add().height(600); 
+    table.row();
+    table.add(startButton).width(200).height(50).pad(10);
+    stage.addActor(table);
 
-        // Effects Button
-        effectImage = new Texture("effectsButton.png");
-        ImageButton effectButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(effectImage)));
-        effectButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                effectEnabled = !effectEnabled; 
-                if (effectEnabled) {
-                    buttonClickSound.play(1f); 
-                }
+    // Effects Button
+    effectMute = new Texture("effectsMute.png");
+    effectImage = new Texture("effectsButton.png");
+
+    TextureRegionDrawable effectOnDrawable = new TextureRegionDrawable(new TextureRegion(effectImage));
+    TextureRegionDrawable effectOffDrawable = new TextureRegionDrawable(new TextureRegion(effectMute));
+
+    effectButton = new ImageButton(effectEnabled ? effectOnDrawable : effectOffDrawable);
+    effectButton.addListener(new ClickListener() {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            effectEnabled = !effectEnabled;
+            if (effectEnabled) {
+                buttonClickSound.play(1f);
+                effectButton.getStyle().imageUp = effectOnDrawable; 
+            } else {
+                effectButton.getStyle().imageUp = effectOffDrawable; 
             }
-        });
+        }
+    });
 
-        // Music Button
-        musicImage = new Texture("musicButton.png");
-        ImageButton musicButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(musicImage)));
-        musicButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                musicEnabled = !musicEnabled;
-                if (musicEnabled) {
-                    mainID = mainSound.play(1.0f);
-                    mainSound.setLooping(mainID, true);
-                } else {
-                    if (mainSound != null) {
-                        mainSound.stop(mainID);
-                    }
+    // Music Button
+    musicMute = new Texture("musicMute.png");
+    musicImage = new Texture("musicButton.png");
+
+    TextureRegionDrawable musicOnDrawable = new TextureRegionDrawable(new TextureRegion(musicImage));
+    TextureRegionDrawable musicOffDrawable = new TextureRegionDrawable(new TextureRegion(musicMute));
+
+    musicButton = new ImageButton(musicEnabled ? musicOnDrawable : musicOffDrawable);
+    musicButton.addListener(new ClickListener() {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            musicEnabled = !musicEnabled;
+            if (musicEnabled) {
+                mainID = mainSound.play(1.0f);
+                mainSound.setLooping(mainID, true);
+                musicButton.getStyle().imageUp = musicOnDrawable; 
+            } else {
+                if (mainSound != null) {
+                    mainSound.stop(mainID);
                 }
-                if (effectEnabled){
-                    buttonClickSound.play(1f);
-                }
+                musicButton.getStyle().imageUp = musicOffDrawable; 
             }
-        });
+            if (effectEnabled){
+                buttonClickSound.play(1f);
+            }
+        }
+    });
 
-        Table settingsTable = new Table();
-        settingsTable.setFillParent(true);
-        settingsTable.center();
-        settingsTable.add(musicButton).size(120); 
-        settingsTable.add(effectButton).size(120).pad(10); 
-        stage.addActor(settingsTable);
-    }
-
-    
+    Table settingsTable = new Table();
+    settingsTable.setFillParent(true);
+    settingsTable.center();
+    settingsTable.add(musicButton).size(120);
+    settingsTable.add(effectButton).size(120).pad(10);
+    stage.addActor(settingsTable);
+}
 
     @Override
     public void render(float delta) {
@@ -142,7 +157,10 @@ public class SettingsScreen implements Screen {
         batch.dispose();
         backgroundImage.dispose();
         musicImage.dispose();
+        musicMute.dispose();
         effectImage.dispose();
+        effectMute.dispose();
+        buttonClickSound.dispose();
         stage.dispose();
         skin.dispose();
         mainSound.dispose();

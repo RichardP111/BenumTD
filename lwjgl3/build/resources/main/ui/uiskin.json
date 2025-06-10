@@ -6,6 +6,8 @@ Color: {
 	red: { a: 1, b: 0, g: 0, r: 1 },
 	black: { a: 1, b: 0, g: 0, r: 0 },
 	gray: { a: 1, b: 0.8, g: 0.8, r: 0.8 },
+	brown: { a: 1, b: 0.4, g: 0.2, r: 0.2 },
+	lightbrown: { a: 1, b: 0.6, g: 0.4, r: 0.4 },
 },
 TintedDrawable: {
 	dialogDim: { name: white, color: { r: 0, g: 0, b: 0, a: 0.45 } },
@@ -15,8 +17,8 @@ ButtonStyle: {
 	toggle: { parent: default, checked: default-round-down }
 },
 TextButtonStyle: {
-	default: { parent: default, font: default-font, fontColor: white, disabledFontColor: gray },
-	toggle: { parent: default, checked: default-round-down, downFontColor: red }
+	default: { parent: default, font: default-font, fontColor: white, disabledFontColor: brown },
+	toggle: { parent: default, checked: default-round-down, downFontColor: lightbrown }
 },
 ScrollPaneStyle: {
 	default: { vScroll: default-scroll, hScrollKnob: default-round-large, background: default-rect, hScroll: default-scroll, vScrollKnob: default-round-large }
