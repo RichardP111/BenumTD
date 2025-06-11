@@ -1,6 +1,6 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-05-28
+ * Last modified: 2025-06-10
  * This file is part of Rise of Benum Tower Defense.
  * The settings screen for the game.
  */

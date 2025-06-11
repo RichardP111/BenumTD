@@ -15,6 +15,8 @@ compMice.png
 effectsButton.png
 effectsMute.png
 enemy.jpg
+enemy2.jpg
+enemy3.jpg
 icon.png
 leaveButton.png
 maps/jungleMap.jpg

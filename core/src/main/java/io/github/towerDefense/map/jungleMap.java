@@ -1,6 +1,6 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-06-04
+ * Last modified: 2025-06-10
  * This file is part of Rise of Benum Tower Defense.
  * Jungle map class for the game.
  * This class will handle the jungle map layout and logic
@@ -61,7 +61,9 @@ public class JungleMap implements Screen {
     private Sound newRoundSound;
     private Sound gameOverSound;
     private Sound gameWinSound;
-    private Sound enemyDeathSound;
+    private Sound enemyDeathSound1;
+    private Sound enemyDeathSound2;
+    private Sound enemyDeathSound3;
 
     //wave variables
     private final float TIME_BETWEEN_WAVES = 5f;
@@ -96,27 +98,29 @@ public class JungleMap implements Screen {
     private DragAndDrop.Payload currentDragPayload = null;
 
     //textures/files
-    private Texture enemyTexture;
     private Texture leaveButtonTexture;
     private String projectileFileName;
     private String towerImageFileName; 
+    private Texture enemyTexture1;
+    private Texture enemyTexture2;
+    private Texture enemyTexture3;
 
     //tower properties
     private static final int COST_TOWER_1 = 50;
-    private static final float RANGE_TOWER_1 = 150f;
+    private static final float RANGE_TOWER_1 = 200f;
     private static final float DAMAGE_TOWER_1 = 1f;
     private static final float COOLDOWN_TOWER_1 = 0.3f;
     private static final String TOWER1_IMAGE_PATH = "benum.jpg";
 
-    private static final int COST_TOWER_2 = 75;
+    private static final int COST_TOWER_2 = 100;
     private static final float RANGE_TOWER_2 = 170f;
     private static final float DAMAGE_TOWER_2 = 1.5f;
     private static final float COOLDOWN_TOWER_2 = 0.26f;
     private static final String TOWER2_IMAGE_PATH = "benum2.jpg"; 
 
-    private static final int COST_TOWER_3 = 100;
-    private static final float RANGE_TOWER_3 = 200f;
-    private static final float DAMAGE_TOWER_3 = 2f;
+    private static final int COST_TOWER_3 = 150;
+    private static final float RANGE_TOWER_3 = 150f;
+    private static final float DAMAGE_TOWER_3 = 2.5f;
     private static final float COOLDOWN_TOWER_3 = 0.2f;
     private static final String TOWER3_IMAGE_PATH = "benum3.jpg"; 
 
@@ -133,7 +137,9 @@ public class JungleMap implements Screen {
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         backgroundImage = new Texture("maps/jungleMap.jpg");
-        enemyTexture = new Texture("enemy.jpg");
+        enemyTexture1 = new Texture("enemy.jpg"); 
+        enemyTexture2 = new Texture("enemy2.jpg");
+        enemyTexture3 = new Texture("enemy3.jpg");
         towers = new ArrayList<>();
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
@@ -141,7 +147,7 @@ public class JungleMap implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        benumCoin = 200; //starting coin
+        benumCoin = 100; //starting coin
         lives = 3; //starting live
 
         placementManager = new TowerPlacementManager(towers, this);
@@ -171,7 +177,9 @@ public class JungleMap implements Screen {
         newRoundSound = Gdx.audio.newSound(Gdx.files.internal("audio/newRound.wav"));
         gameWinSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameWin.wav"));
         gameOverSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameOver.mp3"));
-        enemyDeathSound = Gdx.audio.newSound(Gdx.files.internal("audio/jeffDie.mp3"));
+        enemyDeathSound1 = Gdx.audio.newSound(Gdx.files.internal("audio/jeffDie.mp3"));
+        enemyDeathSound2 = Gdx.audio.newSound(Gdx.files.internal("audio/jeffDie.mp3"));
+        enemyDeathSound3 = Gdx.audio.newSound(Gdx.files.internal("audio/jeffDie.mp3")); 
 
         stage = new Stage(new ScreenViewport());
         dragAndDrop = new DragAndDrop();
@@ -429,11 +437,10 @@ public class JungleMap implements Screen {
                 if (enemy.hasReachedEnd()) {
                     lives--;
                 } else if (!enemy.isAlive()) {
-                    addBenumCoin(10);
+                    addBenumCoin(5);
                     if (SettingsScreen.effectEnabled){
-                        enemyDeathSound.play(1f);
+                        enemy.playDeathSound(); 
                     }
-                    enemy.dispose();
                     enemyIterator.remove();
                 }
             }
@@ -441,15 +448,40 @@ public class JungleMap implements Screen {
         batch.end();
 
         waveTimer += delta;
+
         if (waveTimer >= TIME_BETWEEN_WAVES) {
             if (enemiesSpawnedInWave < enemiesPerWave) {
                 individualEnemySpawnTimer += delta;
                 if (individualEnemySpawnTimer >= enemySpawnIntervalInWave) {
                     Vector2 startPoint = enemyPath.getWaypoint(0);
                     if (startPoint != null) {
-                        int enemyHealth = 3 + waveNumber;
-                        float enemySpeed = 70f + waveNumber * 2f;
-                        enemies.add(new Enemy(startPoint.x, startPoint.y, enemySpeed, enemyHealth, Color.ORANGE, enemyPath, batch, enemyTexture));
+                        int enemyHealth;
+                        float enemySpeed;
+                        Texture currentEnemyTexture;
+                        int damageToPlayer;
+                        Sound currentDeathSound;
+
+                        if (waveNumber <= 10) {
+                            enemyHealth = 3 + waveNumber;
+                            enemySpeed = 70f + waveNumber * 2f;
+                            currentEnemyTexture = enemyTexture1;
+                            damageToPlayer = 1;
+                            currentDeathSound = enemyDeathSound1; 
+                        } else if (waveNumber <= 20) {
+                            enemyHealth = 10 + (waveNumber - 5) * 2;
+                            enemySpeed = 90f + (waveNumber - 5) * 1.5f;
+                            currentEnemyTexture = enemyTexture2;
+                            damageToPlayer = 2;
+                            currentDeathSound = enemyDeathSound2; 
+                        } else {
+                            enemyHealth = 30 + (waveNumber - 15) * 5;
+                            enemySpeed = 110f + (waveNumber - 15) * 1f;
+                            currentEnemyTexture = enemyTexture3;
+                            damageToPlayer = 5;
+                            currentDeathSound = enemyDeathSound3; 
+                        }
+
+                        enemies.add(new Enemy(startPoint.x, startPoint.y, enemySpeed, enemyHealth, damageToPlayer, enemyPath, currentEnemyTexture, currentDeathSound));
                         enemiesSpawnedInWave++;
                         individualEnemySpawnTimer = 0f;
                     }
@@ -577,16 +609,31 @@ public class JungleMap implements Screen {
         if (batch != null) batch.dispose();
         if (shapeRenderer != null) shapeRenderer.dispose();
         if (backgroundImage != null) backgroundImage.dispose();
-        if (enemyTexture != null) enemyTexture.dispose();
         if (font != null) font.dispose();
         if (stage != null) stage.dispose();
         if (towerIconTexture1 != null) towerIconTexture1.dispose();
         if (towerIconTexture2 != null) towerIconTexture2.dispose();
         if (towerIconTexture3 != null) towerIconTexture3.dispose();
         if (leaveButtonTexture != null) leaveButtonTexture.dispose();
+        if (enemyTexture1 != null) enemyTexture1.dispose();
+        if (enemyTexture2 != null) enemyTexture2.dispose();
+        if (enemyTexture3 != null) enemyTexture3.dispose();
+        if (enemyDeathSound1 != null) enemyDeathSound1.dispose();
+        if (enemyDeathSound2 != null) enemyDeathSound2.dispose();
+        if (enemyDeathSound3 != null) enemyDeathSound3.dispose();
+        if (mainSound != null) mainSound.dispose();
+        if (towerPlaceSound != null) towerPlaceSound.dispose();
+        if (buttonClickSound != null) buttonClickSound.dispose();
+        if (newRoundSound != null) newRoundSound.dispose(); 
+        if (gameOverSound != null) gameOverSound.dispose();
+        if (gameWinSound != null) gameWinSound.dispose();
 
         for (Towers tower : towers) {
             tower.dispose();
+        }
+
+        for (Enemy enemy : enemies) {
+            enemy.dispose();
         }
     }
 }

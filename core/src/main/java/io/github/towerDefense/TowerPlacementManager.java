@@ -1,6 +1,6 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-06-04
+ * Last modified: 2025-06-11
  * This file is part of Rise of Benum Tower Defense.
  * Manages the placement validation of towers on the game map.
  */
