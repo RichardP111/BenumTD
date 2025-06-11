@@ -1,5 +1,5 @@
 audio/buttonClick.wav
-audio/gameOver.wav
+audio/gameOver.mp3
 audio/gameWin.wav
 audio/jeffDie.mp3
 audio/main.mp3
@@ -7,12 +7,16 @@ audio/musicTowerSelect.mp3
 audio/newRound.wav
 audio/startMusic.mp3
 audio/towerPlace.mp3
+benum.jpg
+benum2.jpg
+benum3.jpg
 benumTowerLogo.png
 compMice.png
 effectsButton.png
 effectsMute.png
 enemy.jpg
 icon.png
+leaveButton.png
 maps/jungleMap.jpg
 maps/jungleMap.png
 musicButton.png

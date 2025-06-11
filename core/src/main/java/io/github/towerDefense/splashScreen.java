@@ -1,7 +1,8 @@
 /**
  * @author Sahil Sahu & Richard Pu
  * Last modified: 2025-05-28
- * This file the starting splash screen of Rise of Benum Tower Defense.
+ * This file is part of Rise of Benum Tower Defense.
+ * Splash screen for the game
  */
 package io.github.towerDefense;
 

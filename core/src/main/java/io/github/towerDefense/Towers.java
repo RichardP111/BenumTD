@@ -1,30 +1,33 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-06-02
+ * Last modified: 2025-06-10
  * This file is part of Rise of Benum Tower Defense.
  * Defines the properties and behavior of a tower unit.
  */
+
 package io.github.towerDefense;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture; 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2; 
 
 public class Towers {
     public float x, y;
-    public static final float SIZE = 50; 
-    private float attackRange;
-    private float attackDamage;
-    private float attackCooldown;
+    public static final float SIZE = 100; 
+    private final float attackRange;
+    private final float attackDamage;
+    private final float attackCooldown;
     private float timeSinceLastAttack; 
-    private Color color;
     private static final int COST = 50; 
-    private String projectileTextureFileName;
+    private final String projectileTextureFileName;
 
     private Enemy currentTarget; 
+
+    private Texture towerTexture;
+    private Sprite towerSprite; 
 
     /**
      * Constructor for the Towers class.
@@ -34,16 +37,24 @@ public class Towers {
      * @param attackDamage The damage dealt by the tower per attack.
      * @param attackCooldown The time (in seconds) between attacks.
      * @param color The color of the tower.
+     * @param projectileTextureFileName The file name for the projectile texture.
+     * @param towerType The file name for the tower image texture.
      */
-    public Towers(float x, float y, float attackRange, float attackDamage, float attackCooldown, Color color, String projectileTextureFileName) {
+    public Towers(float x, float y, float attackRange, float attackDamage, float attackCooldown, String projectileTextureFileName, String towerType) {
         this.x = x;
         this.y = y;
         this.attackRange = attackRange;
         this.attackDamage = attackDamage;
         this.attackCooldown = attackCooldown;
         this.timeSinceLastAttack = 0; 
-        this.color = color;
         this.projectileTextureFileName = projectileTextureFileName;
+
+        if (towerType != null && !towerType.isEmpty()) {
+            this.towerTexture = new Texture(towerType);
+            this.towerSprite = new Sprite(towerTexture);
+            this.towerSprite.setSize(SIZE, SIZE); 
+            this.towerSprite.setPosition(x, y); 
+        }
     }
 
     /**
@@ -60,7 +71,6 @@ public class Towers {
             findNewTarget(enemies);
         }
 
-        // If we have a target and can attack, shoot!
         if (currentTarget != null && timeSinceLastAttack >= attackCooldown) {
             shootProjectile(projectiles, batch);
             timeSinceLastAttack = 0; 
@@ -68,12 +78,13 @@ public class Towers {
     }
 
     /**
-     * Renders the tower on the screen.
-     * @param shapeRenderer The ShapeRenderer to draw the tower's shape.
+     * Renders the tower's sprite. This method will be called within a SpriteBatch.
+     * @param batch The SpriteBatch to draw the tower's sprite.
      */
-    public void render(ShapeRenderer shapeRenderer) {
-        shapeRenderer.setColor(color);
-        shapeRenderer.rect(x, y, SIZE, SIZE);
+    public void renderSprite(SpriteBatch batch) {
+        if (towerSprite != null) {
+            towerSprite.draw(batch);
+        }
     }
 
     /**
@@ -154,5 +165,15 @@ public class Towers {
      */
     public static int getCost() {
         return COST;
+    }
+
+    /**
+     * Disposes of the tower's texture when it's no longer needed.
+     */
+    public void dispose() {
+        if (towerTexture != null) {
+            towerTexture.dispose();
+            towerTexture = null;
+        }
     }
 }

@@ -16,11 +16,9 @@ import io.github.towerDefense.map.JunglePath;
 
 public class TowerPlacementManager {
     private final ArrayList<Towers> towers; 
-    private JungleMap gameMap; 
 
     public TowerPlacementManager(ArrayList<Towers> towers, JungleMap gameMap) {
         this.towers = towers;
-        this.gameMap = gameMap;
     }
     public boolean isOverlapping(float newX, float newY) {
         for (Towers tower : towers) {

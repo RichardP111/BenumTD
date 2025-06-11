@@ -15,25 +15,20 @@ import io.github.towerDefense.map.JunglePath;
 
 public class Enemy {
     public float x, y;
-    public static final float SIZE = 30; // size of the enemy
-    private float speed;
+    public static final float SIZE = 50; // size of the enemy
+    private final float speed;
     private int health;
-    private Color color; // color of the enemy
-    private JunglePath path; // the path the enemy follows
+    private final JunglePath path; // the path the enemy follows
     private int currentWaypointIndex = 0; // current waypoint the enemy is moving towards
-    private Texture enemyTexture;
-    private SpriteBatch batch; // SpriteBatch for rendering the enemy texture
-
+    private final Texture enemyTexture;
 
     public Enemy(float x, float y, float speed, int health, Color color, JunglePath path, SpriteBatch batch, Texture enemyTexture) {
         this.x = x - SIZE / 2f; 
         this.y = y - SIZE / 2f;
         this.speed = speed;
         this.health = health;
-        this.color = color;
         this.path = path;
         this.currentWaypointIndex = 0; // start at the first waypoint
-        this.batch = batch;
         this.enemyTexture = enemyTexture;
     }
 
@@ -54,10 +49,9 @@ public class Enemy {
             currentWaypointIndex++;
             if (currentWaypointIndex >= path.getNumWaypoints()) {
                 // reached the end of the path
-                return;
+                //return;
             }
         } else {
-            // move towards the next waypoint
             Vector2 direction = new Vector2(targetWaypoint).sub(currentPosition).nor();
             this.x += direction.x * speed * delta;
             this.y += direction.y * speed * delta;
@@ -66,10 +60,8 @@ public class Enemy {
 
 
     public void render(SpriteBatch batch) {
-        //shapeRenderer.setColor(color); // Set the enemy's color
-        //shapeRenderer.rect(x, y, SIZE, SIZE); // draw the enemy as a square
         if (enemyTexture != null) {
-            batch.draw(enemyTexture, x, y, SIZE, SIZE); // draw the enemy using the texture
+            batch.draw(enemyTexture, x, y, SIZE, SIZE); 
         }
     }
 
@@ -77,7 +69,7 @@ public class Enemy {
     public void takeDamage(int damage) {
         this.health -= damage;
         if (this.health <= 0) {
-            System.out.println("Enemy defeated!");
+            System.out.println("Enemy defeated");
         }
     }
 
@@ -95,6 +87,6 @@ public class Enemy {
     public boolean hasReachedEnd() {
         return path != null && currentWaypointIndex >= path.getNumWaypoints();
     }
-public void dispose() {
+    public void dispose() {
     }
 }

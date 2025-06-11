@@ -2,7 +2,7 @@
  * @author Sahil Sahu & Richard Pu
  * Last modified: 2025-05-27
  * This file is part of Rise of Benum Tower Defense.
- * Tutorial screen for the game.
+ * Select map screen for the game.
  */
 
 package io.github.towerDefense;
@@ -20,8 +20,6 @@ public class SelectMap implements Screen {
     public void show() {
         System.out.println("Select Loaded");
     }
-
-    
 
     @Override
     public void render(float delta) {

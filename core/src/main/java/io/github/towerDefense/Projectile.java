@@ -1,3 +1,9 @@
+/**
+ * @author Sahil Sahu & Richard Pu
+ * Last modified: 2025-06-10
+ * This file is part of Rise of Benum Tower Defense.
+ * Projectile class for the game, manages the behavior of projectiles fired by towers.
+ */
 package io.github.towerDefense;
 
 import com.badlogic.gdx.graphics.Texture;

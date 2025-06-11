@@ -1,7 +1,8 @@
 /**
  * @author Sahil Sahu & Richard Pu
  * Last modified: 2025-05-28
- * This file the Settings menu screen of Rise of Benum Tower Defense.
+ * This file is part of Rise of Benum Tower Defense.
+ * The settings screen for the game.
  */
 
 package io.github.towerDefense;
@@ -53,7 +54,7 @@ public class SettingsScreen implements Screen {
 public void show() {
     batch = new SpriteBatch();
     backgroundImage = new Texture("startBackground.png");
-    mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
+    mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/startMusic.mp3"));
     buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("audio/buttonClick.wav"));
 
     stage = new Stage(new ScreenViewport());

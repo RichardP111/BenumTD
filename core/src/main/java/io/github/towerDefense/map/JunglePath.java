@@ -1,4 +1,9 @@
-// Path.java
+/**
+ * @author Sahil Sahu & Richard Pu
+ * Last modified: 2025-05-27
+ * This file is part of Rise of Benum Tower Defense.
+ * Manages path finding for the jungle map in the game.
+ */
 package io.github.towerDefense.map;
 
 import java.util.ArrayList;
@@ -7,7 +12,7 @@ import java.util.List;
 import com.badlogic.gdx.math.Vector2;
 
 public class JunglePath {
-    private List<Vector2> waypoints;
+    private final List<Vector2> waypoints;
     private float pathLength;
 
     public JunglePath() {

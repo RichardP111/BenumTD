@@ -12,10 +12,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
 public class Tutorial implements Screen {
-    private final Main game;
 
     public Tutorial(Main game) {
-        this.game = game;
+        System.out.println("Tutorial Screen");
     }
 
     @Override

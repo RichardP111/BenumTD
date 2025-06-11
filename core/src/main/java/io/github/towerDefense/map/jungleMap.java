@@ -16,96 +16,113 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20; 
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor; 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.utils.viewport.ScreenViewport; 
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import io.github.towerDefense.Enemy;
 import io.github.towerDefense.Main;
 import io.github.towerDefense.Projectile;
 import io.github.towerDefense.SettingsScreen;
+import io.github.towerDefense.StartScreen;
 import io.github.towerDefense.TowerPlacementManager;
 import io.github.towerDefense.Towers;
+
 public class JungleMap implements Screen {
     private final Main game;
 
+    //map variables
     private Texture backgroundImage;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
-    private ArrayList<Enemy> enemies;
     private JunglePath enemyPath;
 
+    //sound variables
     private Sound mainSound;
     private long mainID;
     private Sound towerPlaceSound;
-    private Sound buttonClickSound; 
+    private Sound buttonClickSound;
     private Sound newRoundSound;
     private Sound gameOverSound;
     private Sound gameWinSound;
     private Sound enemyDeathSound;
 
-    private float waveTimer;
+    //wave variables
     private final float TIME_BETWEEN_WAVES = 5f;
-    private int waveNumber;
     private final int MAX_WAVES = 40;
+    private float waveTimer;
+    private int waveNumber;
     private int enemiesPerWave;
     private int enemiesSpawnedInWave;
     private float enemySpawnIntervalInWave;
     private float individualEnemySpawnTimer;
 
+    //font variables
     private BitmapFont font;
     private GlyphLayout glyphLayout;
 
+    //game state variables
+    private ArrayList<Enemy> enemies;
     private ArrayList<Towers> towers;
     private ArrayList<Projectile> projectiles;
-    private OrthographicCamera camera; 
+    private OrthographicCamera camera;
     private TowerPlacementManager placementManager;
 
     private int benumCoin;
+    private int lives;
 
-    private Stage stage; 
+    //dag and drop variables
+    private Stage stage;
     private DragAndDrop dragAndDrop;
     private Texture towerIconTexture1, towerIconTexture2, towerIconTexture3;
     private Image towerDraggableImage1, towerDraggableImage2, towerDraggableImage3;
-    private Actor mapDropTargetActor; 
-    private DragAndDrop.Payload currentDragPayload = null; 
+    private Actor mapDropTargetActor;
+    private DragAndDrop.Payload currentDragPayload = null;
 
+    //textures/files
     private Texture enemyTexture;
+    private Texture leaveButtonTexture;
     private String projectileFileName;
+    private String towerImageFileName; 
 
     //tower properties
     private static final int COST_TOWER_1 = 50;
-    private static final Color COLOR_TOWER_1 = Color.BLUE;
     private static final float RANGE_TOWER_1 = 150f;
     private static final float DAMAGE_TOWER_1 = 1f;
     private static final float COOLDOWN_TOWER_1 = 0.3f;
+    private static final String TOWER1_IMAGE_PATH = "benum.jpg";
 
     private static final int COST_TOWER_2 = 75;
-    private static final Color COLOR_TOWER_2 = Color.GREEN;
     private static final float RANGE_TOWER_2 = 170f;
     private static final float DAMAGE_TOWER_2 = 1.5f;
     private static final float COOLDOWN_TOWER_2 = 0.26f;
+    private static final String TOWER2_IMAGE_PATH = "benum2.jpg"; 
 
     private static final int COST_TOWER_3 = 100;
-    private static final Color COLOR_TOWER_3 = Color.RED;
     private static final float RANGE_TOWER_3 = 200f;
     private static final float DAMAGE_TOWER_3 = 2f;
     private static final float COOLDOWN_TOWER_3 = 0.2f;
+    private static final String TOWER3_IMAGE_PATH = "benum3.jpg"; 
 
-    private static final float PATH_CLEARANCE_FROM_TOWER_EDGE = 10f; 
+    //boundaries
+    private static final float PATH_CLEARANCE_FROM_TOWER_EDGE = 10f;
+    private static final float USER_PANEL_HEIGHT = 170f;
 
     public JungleMap(Main game) {
         this.game = game;
@@ -115,7 +132,7 @@ public class JungleMap implements Screen {
     public void show() {
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
-        backgroundImage = new Texture("maps/jungleMap.jpg"); 
+        backgroundImage = new Texture("maps/jungleMap.jpg");
         enemyTexture = new Texture("enemy.jpg");
         towers = new ArrayList<>();
         enemies = new ArrayList<>();
@@ -124,20 +141,25 @@ public class JungleMap implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        benumCoin = 200; 
-        placementManager = new TowerPlacementManager(towers, this); 
+        benumCoin = 200; //starting coin
+        lives = 3; //starting live
+
+        placementManager = new TowerPlacementManager(towers, this);
         enemyPath = new JunglePath();
 
-        waveTimer = TIME_BETWEEN_WAVES; 
+        waveTimer = TIME_BETWEEN_WAVES;
         waveNumber = 1;
-        enemiesPerWave = 3; 
+        enemiesPerWave = 3; //starting # enemy
         enemiesSpawnedInWave = 0;
-        enemySpawnIntervalInWave = 1.0f; 
+        enemySpawnIntervalInWave = 1.0f;
         individualEnemySpawnTimer = 0f;
 
-        font = new BitmapFont(); 
+        //font info
+        font = new BitmapFont();
         glyphLayout = new GlyphLayout();
+        font.getData().setScale(2.5f);
 
+        // Load sounds
         mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
         if (SettingsScreen.musicEnabled) {
             mainID = mainSound.play(1.0f);
@@ -148,111 +170,81 @@ public class JungleMap implements Screen {
         buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("audio/buttonClick.wav"));
         newRoundSound = Gdx.audio.newSound(Gdx.files.internal("audio/newRound.wav"));
         gameWinSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameWin.wav"));
-        gameOverSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameOver.wav"));
+        gameOverSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameOver.mp3"));
         enemyDeathSound = Gdx.audio.newSound(Gdx.files.internal("audio/jeffDie.mp3"));
 
-        stage = new Stage(new ScreenViewport()); 
+        stage = new Stage(new ScreenViewport());
         dragAndDrop = new DragAndDrop();
 
         mapDropTargetActor = new Actor();
-        mapDropTargetActor.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()); 
-        stage.addActor(mapDropTargetActor); 
+        mapDropTargetActor.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.addActor(mapDropTargetActor);
 
-        Pixmap pixmap1 = new Pixmap(50, 50, Pixmap.Format.RGBA8888);
-        pixmap1.setColor(COLOR_TOWER_1);
-        pixmap1.fillRectangle(0, 0, 50, 50);
-        towerIconTexture1 = new Texture(pixmap1);
-        pixmap1.dispose();
-
-        Pixmap pixmap2 = new Pixmap(50, 50, Pixmap.Format.RGBA8888);
-        pixmap2.setColor(COLOR_TOWER_2);
-        pixmap2.fillRectangle(0, 0, 50, 50);
-        towerIconTexture2 = new Texture(pixmap2);
-        pixmap2.dispose();
-
-        Pixmap pixmap3 = new Pixmap(50, 50, Pixmap.Format.RGBA8888);
-        pixmap3.setColor(COLOR_TOWER_3);
-        pixmap3.fillRectangle(0, 0, 50, 50);
-        towerIconTexture3 = new Texture(pixmap3);
-        pixmap3.dispose();
+        //drag and drop
+        towerIconTexture1 = new Texture(TOWER1_IMAGE_PATH);
+        towerIconTexture2 = new Texture(TOWER2_IMAGE_PATH);
+        towerIconTexture3 = new Texture(TOWER3_IMAGE_PATH);
 
         towerDraggableImage1 = new Image(towerIconTexture1);
-        towerDraggableImage1.setPosition(10, 10); 
+        towerDraggableImage1.setSize(Towers.SIZE, Towers.SIZE);
+        towerDraggableImage1.setPosition(10, 10);
         stage.addActor(towerDraggableImage1);
-      
+
         towerDraggableImage2 = new Image(towerIconTexture2);
+        towerDraggableImage2.setSize(Towers.SIZE, Towers.SIZE);
         towerDraggableImage2.setPosition(10 + towerDraggableImage1.getWidth() + 10, 10);
         stage.addActor(towerDraggableImage2);
 
         towerDraggableImage3 = new Image(towerIconTexture3);
+        towerDraggableImage3.setSize(Towers.SIZE, Towers.SIZE); 
         towerDraggableImage3.setPosition(10 + towerDraggableImage1.getWidth() + 10 + towerDraggableImage2.getWidth() + 10, 10);
         stage.addActor(towerDraggableImage3);
 
         addDragAndDropSource(towerDraggableImage1, "TowerType1", towerIconTexture1);
         addDragAndDropSource(towerDraggableImage2, "TowerType2", towerIconTexture2);
         addDragAndDropSource(towerDraggableImage3, "TowerType3", towerIconTexture3);
-        
-        dragAndDrop.addTarget(new DragAndDrop.Target(mapDropTargetActor) { 
+
+         dragAndDrop.addTarget(new DragAndDrop.Target(mapDropTargetActor) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Vector3 mouseScreenCoords = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-                Vector3 worldCoordinates = camera.unproject(mouseScreenCoords.cpy()); 
-
-                float potentialTowerCenterX = worldCoordinates.x;
-                float potentialTowerCenterY = worldCoordinates.y;
-                float checkTopLeftX = potentialTowerCenterX - Towers.SIZE / 2f;
-                float checkTopLeftY = potentialTowerCenterY - Towers.SIZE / 2f;
-
-                boolean canAfford = getBenumCoin() >= getTowerCost( (String) payload.getObject());
-                boolean overlaps = placementManager.isOverlapping(checkTopLeftX, checkTopLeftY);
-                boolean nearPath = placementManager.isNearPath(potentialTowerCenterX, potentialTowerCenterY, enemyPath, PATH_CLEARANCE_FROM_TOWER_EDGE);
-
-                if (payload.getDragActor() != null) {
-
-                    if (canAfford && !overlaps && !nearPath) {
-                         payload.getDragActor().setColor(Color.GREEN); 
-                    } else {
-                         payload.getDragActor().setColor(Color.RED); 
-                    }
-                }
-                return true; 
+                return true;
             }
 
             @Override
             public void reset(DragAndDrop.Source source, DragAndDrop.Payload payload) {
                 if (payload.getDragActor() != null) {
-                    payload.getDragActor().setColor(Color.WHITE); 
+                    payload.getDragActor().setColor(Color.WHITE);
                 }
             }
 
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Vector3 worldCoordinates = camera.unproject(new Vector3(x, Gdx.graphics.getHeight()-y, 0)); 
+                Vector3 worldCoordinates = camera.unproject(new Vector3(x, Gdx.graphics.getHeight()-y, 0));
 
                 String towerTypeString = (String) payload.getObject();
-                
+
                 int towerCost = getTowerCost(towerTypeString);
-                Color towerColor = Color.WHITE; 
                 float attackRange = 0, attackDamage = 0, attackCooldown = 0;
 
+                //tower types
                 switch (towerTypeString) {
                     case "TowerType1":
                         projectileFileName = "compMice.png";
-                        towerColor = COLOR_TOWER_1;
+                        towerImageFileName = TOWER1_IMAGE_PATH;
                         attackRange = RANGE_TOWER_1;
                         attackDamage = DAMAGE_TOWER_1;
                         attackCooldown = COOLDOWN_TOWER_1;
                         break;
                     case "TowerType2":
                         projectileFileName = "table.png";
-                        towerColor = COLOR_TOWER_2;
+                        towerImageFileName = TOWER2_IMAGE_PATH;
                         attackRange = RANGE_TOWER_2;
                         attackDamage = DAMAGE_TOWER_2;
                         attackCooldown = COOLDOWN_TOWER_2;
                         break;
                     case "TowerType3":
                         projectileFileName = "school.png";
-                        towerColor = COLOR_TOWER_3;
+                        towerImageFileName = TOWER3_IMAGE_PATH;
                         attackRange = RANGE_TOWER_3;
                         attackDamage = DAMAGE_TOWER_3;
                         attackCooldown = COOLDOWN_TOWER_3;
@@ -264,15 +256,15 @@ public class JungleMap implements Screen {
                 float placeX = worldCoordinates.x - Towers.SIZE / 2f;
                 float placeY = worldCoordinates.y - Towers.SIZE / 2f;
 
-                
+                //checks before placing
                 boolean canAfford = getBenumCoin() >= towerCost;
                 boolean overlaps = placementManager.isOverlapping(placeX, placeY);
                 boolean nearPath = placementManager.isNearPath(placeX, placeY, enemyPath, PATH_CLEARANCE_FROM_TOWER_EDGE);
+                boolean inUserPanel = placeY < USER_PANEL_HEIGHT;
 
-
-                if (canAfford && !overlaps && !nearPath) {
+                if (canAfford && !overlaps && !nearPath && !inUserPanel) {
                     if (spendBenumCoin(towerCost)) {
-                        towers.add(new Towers(placeX, placeY, attackRange, attackDamage, attackCooldown, towerColor, projectileFileName));
+                        towers.add(new Towers(placeX, placeY, attackRange, attackDamage, attackCooldown, projectileFileName, towerImageFileName));
                         if (SettingsScreen.effectEnabled){
                             towerPlaceSound.play(500f);
                         }
@@ -281,8 +273,26 @@ public class JungleMap implements Screen {
             }
         });
 
+        //leave button
+        leaveButtonTexture = new Texture("leaveButton.png");
+        ImageButton leaveButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(leaveButtonTexture)));
+        leaveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                mainSound.stop(); 
+                if (SettingsScreen.effectEnabled){
+                    buttonClickSound.play(1f);
+                }
+                game.setScreen(new StartScreen(game));
+            }
+        });
+        
+        leaveButton.setSize(200, 200);
+        leaveButton.setPosition(Gdx.graphics.getWidth() - leaveButton.getWidth() - 20, -20);
+        stage.addActor(leaveButton);
+
         InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(stage); 
+        multiplexer.addProcessor(stage);
         multiplexer.addProcessor(new InputAdapter() {});
         Gdx.input.setInputProcessor(multiplexer);
     }
@@ -291,63 +301,71 @@ public class JungleMap implements Screen {
         if ("TowerType1".equals(towerTypeString)) return COST_TOWER_1;
         if ("TowerType2".equals(towerTypeString)) return COST_TOWER_2;
         if ("TowerType3".equals(towerTypeString)) return COST_TOWER_3;
-        return Integer.MAX_VALUE; 
+        return Integer.MAX_VALUE;
     }
 
     private void addDragAndDropSource(final Image sourceActor, final String towerType, Texture dragActorTexture) {
         dragAndDrop.addSource(new DragAndDrop.Source(sourceActor) {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-                currentDragPayload = new DragAndDrop.Payload(); 
-                currentDragPayload.setObject(towerType); 
+                currentDragPayload = new DragAndDrop.Payload();
+                currentDragPayload.setObject(towerType);
 
                 Image dragImage = new Image(dragActorTexture);
-                dragImage.setSize(Towers.SIZE, Towers.SIZE); 
-                currentDragPayload.setDragActor(dragImage); 
-                
-                dragAndDrop.setDragActorPosition((-dragImage.getWidth()/2f+50), (-dragImage.getHeight()/2f));
-                                
-                sourceActor.getColor().a = 0.4f; 
+                dragImage.setSize(Towers.SIZE, Towers.SIZE);
+                currentDragPayload.setDragActor(dragImage);
+
+                dragAndDrop.setDragActorPosition(-dragImage.getWidth() / 2f + 100, dragImage.getHeight() / 2f - 100);
+
+                sourceActor.getColor().a = 0.4f;
                 return currentDragPayload;
             }
 
             @Override
             public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-                sourceActor.getColor().a = 1f; 
-                if (payload != null && payload.getDragActor() != null) { 
-                     payload.getDragActor().setColor(Color.WHITE); 
+                sourceActor.getColor().a = 1f;
+                if (payload != null && payload.getDragActor() != null) {
+                     payload.getDragActor().setColor(Color.WHITE);
                 }
                 currentDragPayload = null;
             }
         });
     }
 
-
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();
         int screenHeight = Gdx.graphics.getHeight();
 
-        camera.update(); 
+        camera.update();
 
-        batch.setProjectionMatrix(camera.combined); 
+        batch.setProjectionMatrix(camera.combined);
         batch.begin();
         batch.draw(backgroundImage, 0, 0, screenWidth, screenHeight);
 
+        //wave text
         String waveText = "WAVE " + waveNumber + "/" + MAX_WAVES;
         glyphLayout.setText(font, waveText);
         float textX = (screenWidth - glyphLayout.width) / 2;
-        float textY = screenHeight - 20; 
+        float textY = screenHeight - 20;
         font.setColor(Color.WHITE);
         font.draw(batch, waveText, textX, textY);
-        
+
+        //coin text
         String coinText = "BenumCoin: " + benumCoin;
         glyphLayout.setText(font, coinText);
         font.setColor(Color.BLACK);
-        font.draw(batch, coinText, 11, screenHeight - 19); 
+        font.draw(batch, coinText, 11, screenHeight - 19);
         font.setColor(Color.YELLOW);
-        font.draw(batch, coinText, 10, screenHeight - 20); 
-        batch.end();
+        font.draw(batch, coinText, 10, screenHeight - 20);
+
+        //lives text
+        String livesText = "Lives: " + lives;
+        glyphLayout.setText(font, livesText);
+        font.setColor(Color.RED); 
+        font.draw(batch, livesText, 10, screenHeight - 70);
+
+        batch.end(); 
 
         if (currentDragPayload != null) {
             Vector3 mouseScreenCoords = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -362,38 +380,37 @@ public class JungleMap implements Screen {
             boolean canAfford = getBenumCoin() >= getTowerCost(towerTypeString);
             boolean overlaps = placementManager.isOverlapping(checkTopLeftX, checkTopLeftY);
             boolean nearPath = placementManager.isNearPath(potentialTowerCenterX, potentialTowerCenterY, enemyPath, PATH_CLEARANCE_FROM_TOWER_EDGE);
+            boolean inUserPanel = potentialTowerCenterY < USER_PANEL_HEIGHT; 
 
-            Gdx.gl.glEnable(GL20.GL_BLEND); 
+            Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.setProjectionMatrix(camera.combined);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled); 
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-            if (canAfford && !overlaps && !nearPath) {
-                shapeRenderer.setColor(0, 1, 0, 0.3f);
+            //boundary info for user
+            if (canAfford && !overlaps && !nearPath && !inUserPanel) { 
+                shapeRenderer.setColor(0, 1, 0, 0.3f); 
             } else {
-                shapeRenderer.setColor(1, 0, 0, 0.3f); 
+                shapeRenderer.setColor(1, 0, 0, 0.3f);
             }
 
             shapeRenderer.circle(potentialTowerCenterX, potentialTowerCenterY, Towers.SIZE * 2f);
             shapeRenderer.end();
             Gdx.gl.glDisable(GL20.GL_BLEND);
         }
-
-        shapeRenderer.setProjectionMatrix(camera.combined); 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled); 
-
-        // Update and Render Towers
+        
+        batch.begin();
         for (Towers tower : towers) {
             tower.update(delta, enemies, projectiles, batch);
-            tower.render(shapeRenderer);
+            tower.renderSprite(batch); 
         }
-        shapeRenderer.end();
+        batch.end();
 
-        batch.begin(); 
+        batch.begin();
         Iterator<Projectile> projectileIterator = projectiles.iterator();
         while (projectileIterator.hasNext()) {
             Projectile projectile = projectileIterator.next();
-            projectile.update(delta); 
+            projectile.update(delta);
 
             if (!projectile.isActive()) {
                 projectileIterator.remove();
@@ -405,24 +422,23 @@ public class JungleMap implements Screen {
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
-            enemy.move(delta); 
-            enemy.render(batch); 
+            enemy.move(delta);
+            enemy.render(batch);
 
             if (!enemy.isAlive() || enemy.hasReachedEnd()) {
                 if (enemy.hasReachedEnd()) {
-                    //lose life
+                    lives--;
                 } else if (!enemy.isAlive()) {
-                    addBenumCoin(10); 
+                    addBenumCoin(10);
                     if (SettingsScreen.effectEnabled){
                         enemyDeathSound.play(1f);
                     }
                     enemy.dispose();
-                    enemyIterator.remove(); 
+                    enemyIterator.remove();
                 }
             }
         }
-
-        batch.end(); 
+        batch.end();
 
         waveTimer += delta;
         if (waveTimer >= TIME_BETWEEN_WAVES) {
@@ -439,28 +455,37 @@ public class JungleMap implements Screen {
                     }
                 }
 
-            } else if (enemies.isEmpty()) { 
+            } else if (enemies.isEmpty()) {
                 if (waveNumber < MAX_WAVES) {
                     waveNumber++;
-                    enemiesPerWave += 2; 
-                    enemySpawnIntervalInWave = Math.max(0.1f, enemySpawnIntervalInWave - 0.05f); 
+                    enemiesPerWave += 2;
+                    enemySpawnIntervalInWave = Math.max(0.1f, enemySpawnIntervalInWave - 0.05f);
                     enemiesSpawnedInWave = 0;
-                    waveTimer = 0f; 
+                    waveTimer = 0f;
                     if (SettingsScreen.effectEnabled){
                         newRoundSound.play(1f);
                     }
                 } else {
-                    //end game
                     if (SettingsScreen.effectEnabled){
                         gameWinSound.play(1f);
                     }
+                    mainSound.stop();
+                    game.setScreen(new StartScreen(game));
                 }
             }
         }
-        shapeRenderer.end();
 
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f)); 
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw(); 
+
+        if (lives <= 0) {
+            if (SettingsScreen.effectEnabled) {
+                gameOverSound.play(1f);
+            }
+            mainSound.stop();
+            dispose(); 
+            game.setScreen(new StartScreen(game));
+        }
     }
 
     public int getBenumCoin() {
@@ -474,22 +499,22 @@ public class JungleMap implements Screen {
     public boolean spendBenumCoin(int amount) {
         if (benumCoin >= amount) {
             benumCoin -= amount;
-            return true; 
+            return true;
         } else {
-            return false; 
+            return false;
         }
     }
 
     @Override
     public void resize(int width, int height) {
-        camera.setToOrtho(false, width, height); 
-        stage.getViewport().update(width, height, true); 
+        camera.setToOrtho(false, width, height);
+        stage.getViewport().update(width, height, true);
 
         if (mapDropTargetActor != null) {
             mapDropTargetActor.setBounds(0, 0, width, height);
         }
 
-        enemyPath = new JunglePath(); 
+        enemyPath = new JunglePath();
         enemyPath.addWaypoint(width * 1.00f, height * 0.87f);
         enemyPath.addWaypoint(width * 0.82f, height * 0.87f);
         enemyPath.addWaypoint(width * 0.82f, height * 0.66f);
@@ -540,7 +565,7 @@ public class JungleMap implements Screen {
         enemyPath.addWaypoint(width * 0.15f, height * 0.45f);
         enemyPath.addWaypoint(width * 0.20f, height * 0.40f);
         enemyPath.addWaypoint(width * 0.20f, height * 0.20f);
-        enemyPath.addWaypoint(width * 0.00f, height * 0.20f); 
+        enemyPath.addWaypoint(width * 0.00f, height * 0.20f);
     }
 
     @Override public void pause() {}
@@ -553,11 +578,15 @@ public class JungleMap implements Screen {
         if (shapeRenderer != null) shapeRenderer.dispose();
         if (backgroundImage != null) backgroundImage.dispose();
         if (enemyTexture != null) enemyTexture.dispose();
-        if (font != null) font.dispose(); 
+        if (font != null) font.dispose();
         if (stage != null) stage.dispose();
         if (towerIconTexture1 != null) towerIconTexture1.dispose();
         if (towerIconTexture2 != null) towerIconTexture2.dispose();
         if (towerIconTexture3 != null) towerIconTexture3.dispose();
+        if (leaveButtonTexture != null) leaveButtonTexture.dispose();
 
+        for (Towers tower : towers) {
+            tower.dispose();
+        }
     }
 }
