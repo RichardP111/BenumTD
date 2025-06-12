@@ -18,18 +18,16 @@ public class Enemy {
     public static final float SIZE = 50; //size of the enemy
     protected float speed;
     protected int health;
-    protected int damageToPlayer;
     private final JunglePath path;
     private int currentWaypointIndex = 0;
     private final Texture enemyTexture;
     private final Sound deathSound;
 
-    public Enemy(float x, float y, float speed, int health, int damageToPlayer, JunglePath path, Texture enemyTexture, Sound deathSound) {
+    public Enemy(float x, float y, float speed, int health, JunglePath path, Texture enemyTexture, Sound deathSound) {
         this.x = x - SIZE / 2f;
         this.y = y - SIZE / 2f;
         this.speed = speed;
         this.health = health;
-        this.damageToPlayer = damageToPlayer;
         this.path = path;
         this.currentWaypointIndex = 0;
         this.enemyTexture = enemyTexture;
@@ -83,10 +81,6 @@ public class Enemy {
 
     public boolean hasReachedEnd() {
         return currentWaypointIndex >= path.getNumWaypoints(); 
-    }
-
-    public int getDamageToPlayer() {
-        return damageToPlayer;
     }
 
     public void playDeathSound() { 

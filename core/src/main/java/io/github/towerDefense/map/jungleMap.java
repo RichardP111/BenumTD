@@ -116,13 +116,13 @@ public class JungleMap implements Screen {
     private static final float RANGE_TOWER_2 = 170f;
     private static final float DAMAGE_TOWER_2 = 1.5f;
     private static final float COOLDOWN_TOWER_2 = 0.26f;
-    private static final String TOWER2_IMAGE_PATH = "benum2.jpg"; 
+    private static final String TOWER2_IMAGE_PATH = "benum2.png"; 
 
     private static final int COST_TOWER_3 = 150;
     private static final float RANGE_TOWER_3 = 150f;
     private static final float DAMAGE_TOWER_3 = 2.5f;
     private static final float COOLDOWN_TOWER_3 = 0.2f;
-    private static final String TOWER3_IMAGE_PATH = "benum3.jpg"; 
+    private static final String TOWER3_IMAGE_PATH = "benum3.png"; 
 
     //boundaries
     private static final float PATH_CLEARANCE_FROM_TOWER_EDGE = 10f;
@@ -138,8 +138,8 @@ public class JungleMap implements Screen {
         shapeRenderer = new ShapeRenderer();
         backgroundImage = new Texture("maps/jungleMap.jpg");
         enemyTexture1 = new Texture("enemy.jpg"); 
-        enemyTexture2 = new Texture("enemy2.jpg");
-        enemyTexture3 = new Texture("enemy3.jpg");
+        enemyTexture2 = new Texture("enemy2.jpeg");
+        enemyTexture3 = new Texture("enemy3.jpeg");
         towers = new ArrayList<>();
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
@@ -168,7 +168,7 @@ public class JungleMap implements Screen {
         // Load sounds
         mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
         if (SettingsScreen.musicEnabled) {
-            mainID = mainSound.play(1.0f);
+            mainID = mainSound.play(0.5f);
             mainSound.setLooping(mainID, true);
         }
 
@@ -177,8 +177,8 @@ public class JungleMap implements Screen {
         newRoundSound = Gdx.audio.newSound(Gdx.files.internal("audio/newRound.wav"));
         gameWinSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameWin.wav"));
         gameOverSound = Gdx.audio.newSound(Gdx.files.internal("audio/gameOver.mp3"));
-        enemyDeathSound1 = Gdx.audio.newSound(Gdx.files.internal("audio/jeffDie.mp3"));
-        enemyDeathSound2 = Gdx.audio.newSound(Gdx.files.internal("audio/jeffDie.mp3"));
+        enemyDeathSound1 = Gdx.audio.newSound(Gdx.files.internal("audio/peteDie.mp3"));
+        enemyDeathSound2 = Gdx.audio.newSound(Gdx.files.internal("audio/nikDie.mp3"));
         enemyDeathSound3 = Gdx.audio.newSound(Gdx.files.internal("audio/jeffDie.mp3")); 
 
         stage = new Stage(new ScreenViewport());
@@ -373,7 +373,24 @@ public class JungleMap implements Screen {
         font.setColor(Color.RED); 
         font.draw(batch, livesText, 10, screenHeight - 70);
 
-        batch.end(); 
+        font.setColor(Color.GREEN); 
+        font.getData().setScale(1.5f); 
+
+        String cost1Text = "$" + COST_TOWER_1;
+        glyphLayout.setText(font, cost1Text);
+        font.draw(batch, cost1Text, towerDraggableImage1.getX() + (towerDraggableImage1.getWidth() - glyphLayout.width) / 2, towerDraggableImage1.getY() + towerDraggableImage1.getHeight() + 20);
+
+        String cost2Text = "$" + COST_TOWER_2;
+        glyphLayout.setText(font, cost2Text);
+        font.draw(batch, cost2Text, towerDraggableImage2.getX() + (towerDraggableImage2.getWidth() - glyphLayout.width) / 2, towerDraggableImage2.getY() + towerDraggableImage2.getHeight() + 20);
+
+        String cost3Text = "$" + COST_TOWER_3;
+        glyphLayout.setText(font, cost3Text);
+        font.draw(batch, cost3Text, towerDraggableImage3.getX() + (towerDraggableImage3.getWidth() - glyphLayout.width) / 2, towerDraggableImage3.getY() + towerDraggableImage3.getHeight() + 20);
+
+        font.getData().setScale(2.5f);
+
+        batch.end();
 
         if (currentDragPayload != null) {
             Vector3 mouseScreenCoords = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -458,30 +475,26 @@ public class JungleMap implements Screen {
                         int enemyHealth;
                         float enemySpeed;
                         Texture currentEnemyTexture;
-                        int damageToPlayer;
                         Sound currentDeathSound;
 
                         if (waveNumber <= 10) {
                             enemyHealth = 3 + waveNumber;
-                            enemySpeed = 70f + waveNumber * 2f;
+                            enemySpeed = 100f + waveNumber * 2f;
                             currentEnemyTexture = enemyTexture1;
-                            damageToPlayer = 1;
                             currentDeathSound = enemyDeathSound1; 
                         } else if (waveNumber <= 20) {
-                            enemyHealth = 10 + (waveNumber - 5) * 2;
-                            enemySpeed = 90f + (waveNumber - 5) * 1.5f;
+                            enemyHealth = 7 + (waveNumber - 5) * 2;
+                            enemySpeed = 120f + (waveNumber - 5) * 1.5f;
                             currentEnemyTexture = enemyTexture2;
-                            damageToPlayer = 2;
                             currentDeathSound = enemyDeathSound2; 
                         } else {
-                            enemyHealth = 30 + (waveNumber - 15) * 5;
-                            enemySpeed = 110f + (waveNumber - 15) * 1f;
+                            enemyHealth = 25 + (waveNumber - 15) * 5;
+                            enemySpeed = 140f + (waveNumber - 15) * 1f;
                             currentEnemyTexture = enemyTexture3;
-                            damageToPlayer = 5;
                             currentDeathSound = enemyDeathSound3; 
                         }
 
-                        enemies.add(new Enemy(startPoint.x, startPoint.y, enemySpeed, enemyHealth, damageToPlayer, enemyPath, currentEnemyTexture, currentDeathSound));
+                        enemies.add(new Enemy(startPoint.x, startPoint.y, enemySpeed, enemyHealth, enemyPath, currentEnemyTexture, currentDeathSound));
                         enemiesSpawnedInWave++;
                         individualEnemySpawnTimer = 0f;
                     }
