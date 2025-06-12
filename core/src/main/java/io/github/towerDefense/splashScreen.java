@@ -1,6 +1,6 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-05-28
+ * Last modified: 2025-06-12
  * This file is part of Rise of Benum Tower Defense.
  * Splash screen for the game
  */
@@ -59,21 +59,17 @@ public class SplashScreen implements Screen {
                 alpha -= delta / 1f; 
                 if (alpha <= 0f) {
                     alpha = 0f;
-                    boolean tutorialCompleted = false;
-                    FileHandle tutorialFile = Gdx.files.local("tutorial_completed.txt");
+                    FileHandle preferences = Gdx.files.local("preferences.txt");
 
-                    if (tutorialFile.exists()) {
-                        String content = tutorialFile.readString().trim(); 
+                    if (preferences.exists()) {
+                        String content = preferences.readString().trim(); 
                         if ("true".equalsIgnoreCase(content)) { 
-                            tutorialCompleted = true;
+                            game.setScreen(new StartScreen(game)); 
+                        } else {
+                            game.setScreen(new Tutorial(game));
                         }
                     }
 
-                    if (!tutorialCompleted) {
-                        game.setScreen(new Tutorial(game));
-                    } else {
-                        game.setScreen(new StartScreen(game)); 
-                    }
                     dispose();
                     return;
                 }

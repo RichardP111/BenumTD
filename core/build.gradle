@@ -12,7 +12,7 @@ dependencies {
   }
 }
 
-tasks.register('javadoc', Javadoc) {
+tasks.named('javadoc', Javadoc) {
     source = sourceSets.main.allJava
     destinationDir = file("${rootProject.projectDir}/javadoc") // Output to a 'javadoc' folder in the root
     classpath = configurations.runtimeClasspath + configurations.implementation
