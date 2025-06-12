@@ -1,6 +1,6 @@
 /**
  * @author Sahil Sahu & Richard Pu
- * Last modified: 2025-06-10
+ * Last modified: 2025-06-12
  * This file is part of Rise of Benum Tower Defense.
  * Jungle map class for the game.
  * This class will handle the jungle map layout and logic
@@ -138,8 +138,8 @@ public class JungleMap implements Screen {
         shapeRenderer = new ShapeRenderer();
         backgroundImage = new Texture("maps/jungleMap.jpg");
         enemyTexture1 = new Texture("enemy.jpg"); 
-        enemyTexture2 = new Texture("enemy2.jpeg");
-        enemyTexture3 = new Texture("enemy3.jpeg");
+        enemyTexture2 = new Texture("enemy2.jpg");
+        enemyTexture3 = new Texture("enemy3.jpg");
         towers = new ArrayList<>();
         enemies = new ArrayList<>();
         projectiles = new ArrayList<>();
@@ -150,7 +150,7 @@ public class JungleMap implements Screen {
         benumCoin = 100; //starting coin
         lives = 3; //starting live
 
-        placementManager = new TowerPlacementManager(towers, this);
+        placementManager = new TowerPlacementManager(towers);
         enemyPath = new JunglePath();
 
         waveTimer = TIME_BETWEEN_WAVES;
