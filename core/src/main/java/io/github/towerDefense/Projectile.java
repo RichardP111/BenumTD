@@ -52,10 +52,13 @@ public Projectile(float x, float y, Enemy target, float speed, int damage, Strin
         }
     }
 
+    /**
+     * Updates the projectile's position and checks for collision with the target.
+     * @param delta Time since last update
+     */
     public void update(float delta) {
         if (!active) return;
 
-        // Check if target is still valid and alive
         if (target != null && target.isAlive()) {
             Vector2 targetCenter = new Vector2(target.x + Enemy.SIZE / 2f, target.y + Enemy.SIZE / 2f);
 

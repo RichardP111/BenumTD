@@ -15,6 +15,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -300,6 +301,7 @@ public class Tutorial implements Screen {
         textBackgroundTexture = new Texture("textBackground.png");
         okButtonTexture = new Texture("okButton.png"); 
 
+        //ok button
         ImageButton okButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(okButtonTexture)));
         okButton.setName("okButton");
         okButton.setSize(150, 70);
@@ -616,7 +618,7 @@ public class Tutorial implements Screen {
                             gameWinSound.play(1f);
                         }
                         mainSound.stop();
-                        game.setScreen(new StartScreen(game));
+                        completeTutorial();
                     }
                 }
             }
@@ -635,14 +637,27 @@ public class Tutorial implements Screen {
         }
     }
 
+    /**
+     * Get the current amount of BenumCoin.
+     * @return
+     */
     public int getBenumCoin() {
         return benumCoin;
     }
 
+    /**
+     * Add a specified amount of BenumCoin to the current total.
+     * @param amount
+     */
     public void addBenumCoin(int amount) {
         benumCoin += amount;
     }
 
+    /**
+     * Spend a specified amount of BenumCoin.
+     * @param amount
+     * @return true if the transaction was successful, false otherwise
+     */
     public boolean spendBenumCoin(int amount) {
         if (benumCoin >= amount) {
             benumCoin -= amount;
@@ -650,6 +665,17 @@ public class Tutorial implements Screen {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Complete the tutorial and save the state to preferences.
+     * This method will write to a local file indicating that the tutorial has been completed.
+     */
+    public void completeTutorial() {
+        FileHandle tutorialFile = Gdx.files.local("preferences.txt");
+        tutorialFile.writeString("true", false);
+        game.setScreen(new StartScreen(game)); 
+        this.dispose(); 
     }
 
     @Override

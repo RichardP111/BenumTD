@@ -4,13 +4,15 @@
  * This file is part of Rise of Benum Tower Defense.
  * Splash screen for the game
  */
+
 package io.github.towerDefense;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch; 
 
 public class SplashScreen implements Screen {
     private final Main game;
@@ -31,15 +33,13 @@ public class SplashScreen implements Screen {
         image = new Texture("benumTowerLogo.png");
     }
 
-    
-
     @Override
     public void render(float delta) {
         elapsedTime += delta;
 
         switch (state) {
             case FADE_IN:
-                alpha += delta / 1f; // Fade in over 2s
+                alpha += delta / 1f;
                 if (alpha >= 1f) {
                     alpha = 1f;
                     state = State.HOLD;
@@ -47,16 +47,30 @@ public class SplashScreen implements Screen {
                 }
                 break;
             case HOLD:
-                if (elapsedTime >= 1f) { // Hold for 1 second
+                if (elapsedTime >= 2f) {
                     state = State.FADE_OUT;
                     elapsedTime = 0f;
                 }
                 break;
             case FADE_OUT:
-                alpha -= delta / 1f; // Fade out over 1s
+                alpha -= delta / 1f; 
                 if (alpha <= 0f) {
                     alpha = 0f;
-                    game.setScreen(new StartScreen(game)); // switch screen here
+                    boolean tutorialCompleted = false;
+                    FileHandle tutorialFile = Gdx.files.local("tutorial_completed.txt");
+
+                    if (tutorialFile.exists()) {
+                        String content = tutorialFile.readString().trim(); 
+                        if ("true".equalsIgnoreCase(content)) { 
+                            tutorialCompleted = true;
+                        }
+                    }
+
+                    if (!tutorialCompleted) {
+                        game.setScreen(new Tutorial(game));
+                    } else {
+                        game.setScreen(new StartScreen(game)); 
+                    }
                     dispose();
                     return;
                 }
@@ -79,7 +93,7 @@ public class SplashScreen implements Screen {
         int y = (windowHeight - scaledHeight) / 2;
 
         batch.begin();
-        batch.setColor(1f, 1f, 1f, alpha); 
+        batch.setColor(1f, 1f, 1f, alpha);
         batch.draw(image, x, y, scaledWidth, scaledHeight);
         batch.end();
     }

@@ -20,10 +20,10 @@ public class JunglePath {
         pathLength = 0f;
     }
 
-    
-    /** 
-     * @param x
-     * @param y
+    /**
+     * Adds a waypoint to the path.
+     * @param x The x-coordinate of the waypoint.
+     * @param y The y-coordinate of the waypoint.
      */
     public void addWaypoint(float x, float y) {
         waypoints.add(new Vector2(x, y));
@@ -34,6 +34,11 @@ public class JunglePath {
         }
     }
 
+    /**
+     * Retrieves a waypoint at the specified index.
+     * @param index
+     * @return
+     */
     public Vector2 getWaypoint(int index) {
         if (index >= 0 && index < waypoints.size()) {
             return waypoints.get(index);
@@ -41,10 +46,19 @@ public class JunglePath {
         return null;
     }
 
+    /**
+     * Returns the number of waypoints in the path.
+     * @return
+     */
+
     public int getNumWaypoints() {
         return waypoints.size();
     }
 
+    /**
+     * Returns the total length of the path.
+     * @return
+     */
     public float getPathLength() {
         return pathLength;
     }

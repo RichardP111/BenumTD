@@ -4,6 +4,7 @@
  * This file is part of Rise of Benum Tower Defense.
  * Defines the properties and behavior of an enemy unit.
  */
+
 package io.github.towerDefense;
 
 import com.badlogic.gdx.audio.Sound;
@@ -34,6 +35,10 @@ public class Enemy {
         this.deathSound = deathSound;
     }
 
+    /**
+     * Moves the enemy towards the next waypoint in the path.
+     * @param delta
+     */
     public void move(float delta) {
         if (path == null || currentWaypointIndex >= path.getNumWaypoints()) {
             //end path
@@ -64,6 +69,10 @@ public class Enemy {
         }
     }
 
+    /**
+     * Applies damage to the enemy.
+     * @param damage The amount of damage to apply.
+     */
     public void takeDamage(int damage) {
         this.health -= damage;
         if (this.health <= 0) {
@@ -71,18 +80,34 @@ public class Enemy {
         }
     }
 
+    /**
+     * Returns the current health of the enemy.
+     * @return The health of the enemy.
+     */
     public int getHealth() {
         return health;
     }
 
+    /**
+     * Returns the current position of the enemy.
+     * @return A Vector2 representing the position of the enemy.
+     */
     public boolean isAlive() {
         return health > 0; 
     }
 
+    
+    /**
+     * Checks if the enemy has reached the end of the path.
+     * @return
+     */
     public boolean hasReachedEnd() {
         return currentWaypointIndex >= path.getNumWaypoints(); 
     }
 
+    /**
+     * Plays the death sound when the enemy is defeated.
+     */
     public void playDeathSound() { 
         if (deathSound != null) {
             deathSound.play(1f); 

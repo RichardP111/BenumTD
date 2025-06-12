@@ -373,6 +373,7 @@ public class JungleMap implements Screen {
         font.setColor(Color.RED); 
         font.draw(batch, livesText, 10, screenHeight - 70);
 
+        //cost of towers
         font.setColor(Color.GREEN); 
         font.getData().setScale(1.5f); 
 
@@ -477,6 +478,7 @@ public class JungleMap implements Screen {
                         Texture currentEnemyTexture;
                         Sound currentDeathSound;
 
+                        //types of enemies
                         if (waveNumber <= 10) {
                             enemyHealth = 3 + waveNumber;
                             enemySpeed = 100f + waveNumber * 2f;
@@ -533,14 +535,28 @@ public class JungleMap implements Screen {
         }
     }
 
+    /**
+     * Returns the current amount of benum coins.
+     * @return the current amount of benum coins
+     */
+
     public int getBenumCoin() {
         return benumCoin;
     }
 
+    /**
+     * Adds the specified amount of benum coins to the current total.
+     * @param amount the amount of benum coins to add
+     */
     public void addBenumCoin(int amount) {
         benumCoin += amount;
     }
 
+    /**
+     * Attempts to spend the specified amount of benum coins.
+     * @param amount the amount of benum coins to spend
+     * @return true if the transaction was successful, false otherwise
+     */
     public boolean spendBenumCoin(int amount) {
         if (benumCoin >= amount) {
             benumCoin -= amount;

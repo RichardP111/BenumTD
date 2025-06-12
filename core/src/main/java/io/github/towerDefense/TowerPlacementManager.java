@@ -19,6 +19,13 @@ public class TowerPlacementManager {
     public TowerPlacementManager(ArrayList<Towers> towers) { //, JungleMap gameMap
         this.towers = towers;
     }
+
+    /**
+     * Checks if the new tower position overlaps with any existing towers.
+     * @param newX The x-coordinate of the new tower.
+     * @param newY The y-coordinate of the new tower.
+     * @return true if the new tower overlaps with any existing tower, false otherwise.
+     */
     public boolean isOverlapping(float newX, float newY) {
         for (Towers tower : towers) {
             if (newX < tower.x + Towers.SIZE &&  
@@ -30,6 +37,15 @@ public class TowerPlacementManager {
         }
         return false; 
     }
+
+    /**
+     * Checks if the tower is near a path.
+     * @param towerCenterX
+     * @param towerCenterY
+     * @param path
+     * @param clearanceFromTowerEdgeToPath
+     * @return
+     */
     public boolean isNearPath(float towerCenterX, float towerCenterY, JunglePath path, float clearanceFromTowerEdgeToPath) {
     if (path == null || path.getNumWaypoints() < 2) {
         return false; 
