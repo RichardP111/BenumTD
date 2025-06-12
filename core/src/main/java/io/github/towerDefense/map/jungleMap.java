@@ -305,6 +305,10 @@ public class JungleMap implements Screen {
         Gdx.input.setInputProcessor(multiplexer);
     }
 
+    /** 
+     * @param towerTypeString
+     * @return int
+     */
     private int getTowerCost(String towerTypeString) {
         if ("TowerType1".equals(towerTypeString)) return COST_TOWER_1;
         if ("TowerType2".equals(towerTypeString)) return COST_TOWER_2;
@@ -312,6 +316,11 @@ public class JungleMap implements Screen {
         return Integer.MAX_VALUE;
     }
 
+    /** 
+     * @param sourceActor
+     * @param towerType
+     * @param dragActorTexture
+     */
     private void addDragAndDropSource(final Image sourceActor, final String towerType, Texture dragActorTexture) {
         dragAndDrop.addSource(new DragAndDrop.Source(sourceActor) {
             @Override
@@ -340,6 +349,9 @@ public class JungleMap implements Screen {
         });
     }
 
+    /** 
+     * @param delta
+     */
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();
@@ -533,6 +545,9 @@ public class JungleMap implements Screen {
             dispose(); 
             game.setScreen(new StartScreen(game));
         }
+    /** 
+     * @return int
+     */
     }
 
     /**
@@ -541,6 +556,10 @@ public class JungleMap implements Screen {
      */
 
     public int getBenumCoin() {
+    /** 
+     * @param amount
+     * @return boolean
+     */
         return benumCoin;
     }
 

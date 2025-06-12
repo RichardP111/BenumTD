@@ -39,6 +39,7 @@ public class Enemy {
      * Moves the enemy towards the next waypoint in the path.
      * @param delta
      */
+
     public void move(float delta) {
         if (path == null || currentWaypointIndex >= path.getNumWaypoints()) {
             //end path
@@ -63,6 +64,9 @@ public class Enemy {
         }
     }
 
+    /** 
+     * @param batch
+     */
     public void render(SpriteBatch batch) {
         if (enemyTexture != null) {
             batch.draw(enemyTexture, x, y, SIZE, SIZE);
@@ -72,6 +76,9 @@ public class Enemy {
     /**
      * Applies damage to the enemy.
      * @param damage The amount of damage to apply.
+     */
+    /** 
+     * @param damage
      */
     public void takeDamage(int damage) {
         this.health -= damage;
@@ -84,13 +91,16 @@ public class Enemy {
      * Returns the current health of the enemy.
      * @return The health of the enemy.
      */
+    /** 
+     * @return int
+     */
     public int getHealth() {
         return health;
     }
 
     /**
-     * Returns the current position of the enemy.
-     * @return A Vector2 representing the position of the enemy.
+     * Checks if the enemy is still alive.
+     * @return true if the enemy's health is greater than 0, false otherwise.
      */
     public boolean isAlive() {
         return health > 0; 
@@ -99,7 +109,7 @@ public class Enemy {
     
     /**
      * Checks if the enemy has reached the end of the path.
-     * @return
+     * @return true if the current waypoint index is greater than or equal to the number of waypoints, false otherwise.
      */
     public boolean hasReachedEnd() {
         return currentWaypointIndex >= path.getNumWaypoints(); 

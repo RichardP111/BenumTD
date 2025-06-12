@@ -125,6 +125,9 @@ public class StartScreen implements Screen {
 
     
 
+    /** 
+     * @param delta
+     */
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();

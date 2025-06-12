@@ -140,6 +140,9 @@ public void show() {
     stage.addActor(settingsTable);
 }
 
+    /** 
+     * @param delta
+     */
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();

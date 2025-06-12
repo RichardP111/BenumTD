@@ -22,10 +22,16 @@ public class Lwjgl3Launcher {
         createApplication();
     }
 
+    /** 
+     * @return Lwjgl3Application
+     */
     private static Lwjgl3Application createApplication() {
         return new Lwjgl3Application(new Main(), getDefaultConfiguration());
     }
 
+    /** 
+     * @return Lwjgl3ApplicationConfiguration
+     */
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         config.setTitle("Rise of Benum Tower Defense"); // Sets the title of the window.

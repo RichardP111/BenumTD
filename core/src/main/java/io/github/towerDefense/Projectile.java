@@ -56,6 +56,7 @@ public Projectile(float x, float y, Enemy target, float speed, int damage, Strin
      * Updates the projectile's position and checks for collision with the target.
      * @param delta Time since last update
      */
+
     public void update(float delta) {
         if (!active) return;
 
@@ -81,23 +82,38 @@ public Projectile(float x, float y, Enemy target, float speed, int damage, Strin
         }
     }
 
+    /** 
+     * @param batch
+     */
     public void render(SpriteBatch batch) {
         if (!active || projectileSprite == null) return;
         projectileSprite.draw(batch);
     }
 
+    /** 
+     * @return boolean
+     */
     public boolean isActive() {
         return active;
     }
 
+    /** 
+     * @return int
+     */
     public int getDamage() {
         return damage;
     }
 
+    /** 
+     * @return Enemy
+     */
     public Enemy getTarget() {
         return target;
     }
 
+    /** 
+     * @return Vector2
+     */
     public Vector2 getPosition() {
         return position;
     }

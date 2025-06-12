@@ -36,7 +36,6 @@ public class Towers {
      * @param attackRange The range within which the tower can attack enemies.
      * @param attackDamage The damage dealt by the tower per attack.
      * @param attackCooldown The time (in seconds) between attacks.
-     * @param color The color of the tower.
      * @param projectileTextureFileName The file name for the projectile texture.
      * @param towerType The file name for the tower image texture.
      */

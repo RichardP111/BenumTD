@@ -33,6 +33,9 @@ public class SplashScreen implements Screen {
         image = new Texture("benumTowerLogo.png");
     }
 
+    /** 
+     * @param delta
+     */
     @Override
     public void render(float delta) {
         elapsedTime += delta;

@@ -1,0 +1,17 @@
+-classpath 'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\build\\classes\\java\\main;C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\build\\resources\\main;C:\\Users\\richa\\.gradle\\caches\\modules-2\\files-2.1\\com.github.tommyettinger\\gand\\0.3.3\\946d406f34c83a89d93ca09698300d8b65caa03c\\gand-0.3.3.jar;C:\\Users\\richa\\.gradle\\caches\\modules-2\\files-2.1\\com.github.tommyettinger\\gdcrux\\0.1.1\\f075bdef591c5ec9041f3b5e8ec128bd89f125a0\\gdcrux-0.1.1.jar;C:\\Users\\richa\\.gradle\\caches\\modules-2\\files-2.1\\com.badlogicgames.gdx\\gdx\\1.13.1\\734d9a5ca877bbce0c595dbdc3165fe6a22b7a30\\gdx-1.13.1.jar;C:\\Users\\richa\\.gradle\\caches\\modules-2\\files-2.1\\com.github.tommyettinger\\crux\\0.1.2\\9ad264a50e51071c504fad7b16484cedba460bbb\\crux-0.1.2.jar;C:\\Users\\richa\\.gradle\\caches\\modules-2\\files-2.1\\com.badlogicgames.gdx\\gdx-jnigen-loader\\2.5.2\\f35e90affe07c46b4f5e5958a1a4c1820c4890e2\\gdx-jnigen-loader-2.5.2.jar'
+-d 'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\build\\docs\\javadoc'
+-doctitle 'core 1.0.0 API'
+-notimestamp 
+-quiet 
+-windowtitle 'core 1.0.0 API'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\Enemy.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\Main.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\map\\JungleMap.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\map\\JunglePath.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\Projectile.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\SettingsScreen.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\SplashScreen.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\StartScreen.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\TowerPlacementManager.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\Towers.java'
+'C:\\Users\\richa\\OneDrive\\Documents\\THE GOOD ONE\\BenumTD\\core\\src\\main\\java\\io\\github\\towerDefense\\Tutorial.java'
