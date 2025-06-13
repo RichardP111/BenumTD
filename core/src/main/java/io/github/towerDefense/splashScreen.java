@@ -88,7 +88,6 @@ public class SplashScreen implements Screen {
                             game.setScreen(new Tutorial(game));
                         }
                     } else {
-
                         game.setScreen(new Tutorial(game)); 
                     }
 

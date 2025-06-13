@@ -606,16 +606,15 @@ public class Tutorial implements Screen {
                 enemy.move(delta);
                 enemy.render(batch);
 
-                if (!enemy.isAlive() || enemy.hasReachedEnd()) {
-                    if (enemy.hasReachedEnd()) {
-                        lives--;
-                    } else if (!enemy.isAlive()) {
-                        addBenumCoin(5);
-                        if (SettingsScreen.effectEnabled){
-                            enemy.playDeathSound();
-                        }
-                        enemyIterator.remove();
+                if (enemy.hasReachedEnd()) { 
+                    lives--;
+                    enemyIterator.remove();
+                } else if (!enemy.isAlive()) { 
+                    addBenumCoin(5);
+                    if (SettingsScreen.effectEnabled){
+                        enemy.playDeathSound(); 
                     }
+                    enemyIterator.remove();
                 }
             }
             batch.end();
