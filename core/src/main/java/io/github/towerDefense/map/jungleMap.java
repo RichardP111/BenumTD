@@ -375,6 +375,8 @@ public class JungleMap implements Screen {
 
     /**
      * main render method that updates the game state and renders the game map.
+     * pre: delta is a valid float value representing the time since the last frame.
+     * post: the game map is rendered with the current game state, including background, towers, enemies, and UI elements.
      */
 
     @Override

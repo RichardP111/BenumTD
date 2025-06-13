@@ -305,7 +305,7 @@ public class Tutorial implements Screen {
                 if (SettingsScreen.effectEnabled){
                     buttonClickSound.play(1f);
                 }
-                game.setScreen(new StartScreen(game));
+                completeTutorial();
             }
         });
 
@@ -508,7 +508,7 @@ public class Tutorial implements Screen {
                                    "The enemies are tougher now. Make sure your defenses are robust. Don't be afraid to sell and re-strategize.";
                     break;
                 case 7: 
-                    tutorialText = "FINAL WAVE! Wave 5: This is it, Commander!\n\n" +
+                    tutorialText = "FINAL WAVE! Wave 5: This is it!\n\n" +
                                    "Deploy your best strategy and towers to defeat the final assault. Victory is within reach!";
                     break;
                 default:

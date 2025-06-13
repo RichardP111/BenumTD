@@ -61,6 +61,10 @@ public void show() {
     batch = new SpriteBatch();
     backgroundImage = new Texture("startBackground.png");
     mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/startMusic.mp3"));
+    if (musicEnabled) {
+        mainID = mainSound.play(1.0f);
+        mainSound.setLooping(mainID, true);
+    }
     buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("audio/buttonClick.wav"));
 
     stage = new Stage(new ScreenViewport());

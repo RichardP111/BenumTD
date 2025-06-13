@@ -144,6 +144,7 @@ public class StartScreen implements Screen {
                 if (SettingsScreen.effectEnabled){
                     buttonClickSound.play(1f);
                 }
+                mainSound.stop();
                 game.setScreen(new SettingsScreen(game));
             }
         });

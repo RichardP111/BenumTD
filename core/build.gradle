@@ -12,14 +12,14 @@ dependencies {
   }
 }
 
-tasks.named('javadoc', Javadoc) {
-    source = sourceSets.main.allJava
-    destinationDir = file("${rootProject.projectDir}/javadoc") // Output to a 'javadoc' folder in the root
-    classpath = configurations.runtimeClasspath // FIX: Only use runtimeClasspath, not implementation
-    options.encoding = 'UTF-8'
-    options.addStringOption('Xdoclint:none', '-quiet') // Suppress doclint warnings (optional)
-    options.links('https://docs.oracle.com/javase/8/docs/api/', // Link to Java API
-                  'https://libgdx.com/documentation/api/1.13.1/' // <-- updated link
-                 )
+// tasks.named('javadoc', Javadoc) {
+//     source = sourceSets.main.allJava
+//     destinationDir = file("${rootProject.projectDir}/javadoc") // Output to a 'javadoc' folder in the root
+//     classpath = configurations.runtimeClasspath // FIX: Only use runtimeClasspath, not implementation
+//     options.encoding = 'UTF-8'
+//     options.addStringOption('Xdoclint:none', '-quiet') // Suppress doclint warnings (optional)
+//     options.links('https://docs.oracle.com/javase/8/docs/api/', // Link to Java API
+//                   'https://libgdx.com/documentation/api/1.13.1/' // <-- updated link
+//                  )
 
-}
+// } ./gradlew :core:javadoc

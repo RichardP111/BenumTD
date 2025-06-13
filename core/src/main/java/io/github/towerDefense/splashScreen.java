@@ -11,8 +11,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch; 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class SplashScreen implements Screen {
     private final Main game;
@@ -35,7 +36,16 @@ public class SplashScreen implements Screen {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        image = new Texture("benumTowerLogo.png");
+        try {
+            image = new Texture("benumTowerLogo.png");
+        } catch (Exception e) {
+            // If not found, create a 200x200 blank texture
+            Pixmap pixmap = new Pixmap(200, 200, Pixmap.Format.RGBA8888);
+            pixmap.setColor(1, 1, 1, 1); // white
+            pixmap.fill();
+            image = new Texture(pixmap);
+            pixmap.dispose();
+        }
     }
 
     /**
@@ -68,15 +78,18 @@ public class SplashScreen implements Screen {
                 alpha -= delta / 1f; 
                 if (alpha <= 0f) {
                     alpha = 0f;
-                    FileHandle preferences = Gdx.files.local("preferences.txt"); //checks if tutorial has been completed
+                    FileHandle preferences = Gdx.files.local("preferences.txt"); 
 
-                    if (preferences.exists()) {
+                    if (preferences.exists()) { //checks if tutorial has been completed
                         String content = preferences.readString().trim(); 
                         if ("true".equalsIgnoreCase(content)) { 
                             game.setScreen(new StartScreen(game)); 
                         } else {
                             game.setScreen(new Tutorial(game));
                         }
+                    } else {
+
+                        game.setScreen(new Tutorial(game)); 
                     }
 
                     dispose();
