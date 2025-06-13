@@ -22,6 +22,9 @@ public class JunglePath {
 
     /**
      * Adds a waypoint to the path.
+     * Precondition: x and y must be valid coordinates within the game map.
+     * Postcondition: The waypoint is added to the path, and the path length is updated.
+     * 
      * @param x The x-coordinate of the waypoint.
      * @param y The y-coordinate of the waypoint.
      */
@@ -36,6 +39,9 @@ public class JunglePath {
 
     /**
      * Retrieves a waypoint at the specified index.
+     * Precondition: index must be within the bounds of the waypoints list.
+     * Postcondition: Returns the waypoint at the specified index, or null if the index is out of bounds.
+     * 
      * @param index
      * @return
      */
@@ -48,6 +54,9 @@ public class JunglePath {
 
     /**
      * Returns the number of waypoints in the path.
+     * Precondition: None
+     * Postcondition: Returns the size of the waypoints list.
+     * 
      * @return
      */
 
@@ -57,6 +66,9 @@ public class JunglePath {
 
     /**
      * Returns the total length of the path.
+     * Precondition: None
+     * Postcondition: Returns the total length of the path calculated from the waypoints.
+     * 
      * @return
      */
     public float getPathLength() {

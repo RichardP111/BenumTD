@@ -44,6 +44,11 @@ public class StartScreen implements Screen {
         this.game = game;
     }
 
+    /**
+     * Initializes the start screen.
+     * Pre-condition: Files must exist
+     * Post-condition: Sets up the UI elements, background, and sound effects.
+     */
     @Override
     public void show() {
         batch = new SpriteBatch();
@@ -74,6 +79,15 @@ public class StartScreen implements Screen {
 
         TextButton startButton = new TextButton("Play", skin);
         startButton.addListener(new ClickListener() {
+            /**
+             * Handles the click event for the start button.
+             * Pre-condition: x and y coordinates are valid.
+             * Post-condition: Stops the main sound and navigates to the JungleMap screen.
+             * 
+             * @param event the input event
+             * @param x the x-coordinate of the click
+             * @param y the y-coordinate of the click
+             */
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mainSound.stop();
@@ -86,6 +100,15 @@ public class StartScreen implements Screen {
 
         TextButton tutorialButton = new TextButton("Tutorial", skin);
         tutorialButton.addListener(new ClickListener() {
+            /**
+             * Handles the click event for the tutorial button.
+             * Pre-condition: x and y coordinates are valid.
+             * Post-condition: Stops the main sound and navigates to the Tutorial screen.
+             * 
+             * @param event the input event
+             * @param x the x-coordinate of the click
+             * @param y the y-coordinate of the click
+             */
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mainSound.stop();
@@ -96,7 +119,7 @@ public class StartScreen implements Screen {
             }
         });
 
-        table.add().height(300); // Spacer
+        table.add().height(300);
         table.row();
         table.add(startButton).width(200).height(50).pad(10);
         table.row();
@@ -107,6 +130,15 @@ public class StartScreen implements Screen {
         // Settings button (top right)
         ImageButton settingsButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(settingsImage)));
         settingsButton.addListener(new ClickListener() {
+            /**
+             * Handles the click event for the settings button.
+             * Pre-condition: x and y coordinates are valid.
+             * Post-condition: Stops the main sound and navigates to the Settings screen.
+             * 
+             * @param event the input event
+             * @param x the x-coordinate of the click
+             * @param y the y-coordinate of the click
+             */
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (SettingsScreen.effectEnabled){
@@ -123,10 +155,10 @@ public class StartScreen implements Screen {
         stage.addActor(settingsTable);
     }
 
-    
-
-    /** 
-     * @param delta
+    /**
+     * Renders the start screen.
+     * Pre-condition: The screen must be initialized
+     * Post-condition: Draws the background, logo, and UI elements on the screen.
      */
     @Override
     public void render(float delta) {
@@ -145,6 +177,11 @@ public class StartScreen implements Screen {
         stage.draw();
     }
 
+    /**
+     * Disposes of the resources used by the start screen.
+     * Pre-condition: None
+     * Post-condition: Disposes the sprite batch, textures, stage, skin, and sound resources.
+     */
     @Override
     public void dispose() {
         batch.dispose();
@@ -156,6 +193,11 @@ public class StartScreen implements Screen {
         mainSound.dispose();
     }
 
+    /**
+     * Resizes the viewport of the stage.
+     * Pre-condition: width and height must be valid integers.
+     * Post-condition: updates the viewport of the stage to match the new width and height.
+     */
     @Override public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
     }

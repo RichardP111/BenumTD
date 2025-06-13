@@ -5,6 +5,7 @@
  * Jungle map class for the game.
  * This class will handle the jungle map layout and logic
  */
+
 package io.github.towerDefense.map;
 
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class JungleMap implements Screen {
 
     //wave variables
     private final float TIME_BETWEEN_WAVES = 5f;
-    private final int MAX_WAVES = 40;
+    private final int MAX_WAVES = 40; //wave amount
     private float waveTimer;
     private int waveNumber;
     private int enemiesPerWave;
@@ -132,6 +133,12 @@ public class JungleMap implements Screen {
         this.game = game;
     }
 
+
+    /**
+     * Sets up the game map, initializes variables, and prepares the game state.
+     * Pre: none
+     * Post: the game map is ready to be displayed and interacted with.
+     */
     @Override
     public void show() {
         batch = new SpriteBatch();
@@ -245,8 +252,8 @@ public class JungleMap implements Screen {
                         break;
                     case "TowerType2":
                         projectileFileName = "table.png";
-                        towerImageFileName = TOWER2_IMAGE_PATH;
-                        attackRange = RANGE_TOWER_2;
+                        towerImageFileName = TOWER2_IMAGE_PATH; 
+                        attackRange = RANGE_TOWER_2; 
                         attackDamage = DAMAGE_TOWER_2;
                         attackCooldown = COOLDOWN_TOWER_2;
                         break;
@@ -264,7 +271,7 @@ public class JungleMap implements Screen {
                 float placeX = worldCoordinates.x - Towers.SIZE / 2f;
                 float placeY = worldCoordinates.y - Towers.SIZE / 2f;
 
-                //checks before placing
+                //checks variables before placing
                 boolean canAfford = getBenumCoin() >= towerCost;
                 boolean overlaps = placementManager.isOverlapping(placeX, placeY);
                 boolean nearPath = placementManager.isNearPath(placeX, placeY, enemyPath, PATH_CLEARANCE_FROM_TOWER_EDGE);
@@ -285,6 +292,15 @@ public class JungleMap implements Screen {
         leaveButtonTexture = new Texture("leaveButton.png");
         ImageButton leaveButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(leaveButtonTexture)));
         leaveButton.addListener(new ClickListener() {
+            /**
+             * Called when the leave button is clicked.
+             * Pre-conditions: x and y coordinates are valid.
+             * Post-conditions: The main sound stops, button click sound plays, and the game returns to the start screen.
+             * 
+             * @param event the input event
+             * @param x the x-coordinate of the click
+             * @param y the y-coordinate of the click
+             */
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mainSound.stop(); 
@@ -293,8 +309,8 @@ public class JungleMap implements Screen {
                 }
                 game.setScreen(new StartScreen(game));
             }
-        });
-        
+            });
+    
         leaveButton.setSize(200, 200);
         leaveButton.setPosition(Gdx.graphics.getWidth() - leaveButton.getWidth() - 20, -20);
         stage.addActor(leaveButton);
@@ -305,9 +321,13 @@ public class JungleMap implements Screen {
         Gdx.input.setInputProcessor(multiplexer);
     }
 
-    /** 
-     * @param towerTypeString
-     * @return int
+    /**
+     * Returns the cost of the tower based on its type.
+     * Pre-conditions: towerTypeString must be a valid tower type string.
+     * Post-conditions: Returns the cost of the tower as an integer.
+     * 
+     * @param towerTypeString the type of the tower as a string
+     * @return the cost of the tower
      */
     private int getTowerCost(String towerTypeString) {
         if ("TowerType1".equals(towerTypeString)) return COST_TOWER_1;
@@ -316,10 +336,14 @@ public class JungleMap implements Screen {
         return Integer.MAX_VALUE;
     }
 
-    /** 
-     * @param sourceActor
-     * @param towerType
-     * @param dragActorTexture
+    /**
+     * Adds a drag and drop source for the specified tower type.
+     * Pre-conditions: sourceActor must be a valid Image actor, towerType must be a valid string, and dragActorTexture must not be null.
+     * Post-conditions: The drag and drop source is added to the DragAndDrop system.
+     * 
+     * @param sourceActor the Image actor that will be the source of the drag and drop
+     * @param towerType the type of the tower as a string
+     * @param dragActorTexture the texture for the drag actor
      */
     private void addDragAndDropSource(final Image sourceActor, final String towerType, Texture dragActorTexture) {
         dragAndDrop.addSource(new DragAndDrop.Source(sourceActor) {
@@ -349,9 +373,10 @@ public class JungleMap implements Screen {
         });
     }
 
-    /** 
-     * @param delta
+    /**
+     * main render method that updates the game state and renders the game map.
      */
+
     @Override
     public void render(float delta) {
         int screenWidth = Gdx.graphics.getWidth();
@@ -405,6 +430,7 @@ public class JungleMap implements Screen {
 
         batch.end();
 
+        //tower placement boundary
         if (currentDragPayload != null) {
             Vector3 mouseScreenCoords = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             Vector3 mouseWorldCoords = camera.unproject(mouseScreenCoords.cpy());
@@ -437,6 +463,7 @@ public class JungleMap implements Screen {
             Gdx.gl.glDisable(GL20.GL_BLEND);
         }
         
+        //render towers
         batch.begin();
         for (Towers tower : towers) {
             tower.update(delta, enemies, projectiles, batch);
@@ -444,6 +471,7 @@ public class JungleMap implements Screen {
         }
         batch.end();
 
+        //render projectiles
         batch.begin();
         Iterator<Projectile> projectileIterator = projectiles.iterator();
         while (projectileIterator.hasNext()) {
@@ -457,6 +485,7 @@ public class JungleMap implements Screen {
             }
         }
 
+        //render enemies
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
@@ -477,8 +506,8 @@ public class JungleMap implements Screen {
         }
         batch.end();
 
+        //wave management
         waveTimer += delta;
-
         if (waveTimer >= TIME_BETWEEN_WAVES) {
             if (enemiesSpawnedInWave < enemiesPerWave) {
                 individualEnemySpawnTimer += delta;
@@ -537,7 +566,7 @@ public class JungleMap implements Screen {
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw(); 
 
-        if (lives <= 0) {
+        if (lives <= 0) { //game over
             if (SettingsScreen.effectEnabled) {
                 gameOverSound.play(1f);
             }
@@ -545,36 +574,37 @@ public class JungleMap implements Screen {
             dispose(); 
             game.setScreen(new StartScreen(game));
         }
-    /** 
-     * @return int
-     */
     }
 
     /**
      * Returns the current amount of benum coins.
+     * Pre-conditions: None
+     * Post-conditions: Returns the current total of benum coins.
+     * 
      * @return the current amount of benum coins
      */
-
     public int getBenumCoin() {
-    /** 
-     * @param amount
-     * @return boolean
-     */
         return benumCoin;
     }
 
     /**
      * Adds the specified amount of benum coins to the current total.
-     * @param amount the amount of benum coins to add
+     * Pre-conditions: amount must be a integer.
+     * Post-conditions: The benum coin total is increased by the specified amount.
+     * 
+     * @param amount the amount of coins to add
      */
     public void addBenumCoin(int amount) {
         benumCoin += amount;
     }
 
     /**
-     * Attempts to spend the specified amount of benum coins.
-     * @param amount the amount of benum coins to spend
-     * @return true if the transaction was successful, false otherwise
+     * Spend the specified amount of benum coins.
+     * Pre-conditions: amount must be a positive integer and less than or equal to the current benum coin total.
+     * Post-conditions: The benum coin total is decreased by the specified amount if sufficient coins are available.
+     *
+     * @param amount the amount of coins to spend
+     * @return true if the coins were successfully spent, false otherwise.
      */
     public boolean spendBenumCoin(int amount) {
         if (benumCoin >= amount) {
@@ -585,6 +615,11 @@ public class JungleMap implements Screen {
         }
     }
 
+    /**
+     * Resizes the game map and updates the camera and stage viewport.
+     * Pre-conditions: width and height are valid integers.
+     * Post-conditions: The camera and stage viewport are updated, and the enemy path is recalculated based on the new dimensions.
+     */
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
@@ -594,6 +629,7 @@ public class JungleMap implements Screen {
             mapDropTargetActor.setBounds(0, 0, width, height);
         }
 
+        //path finding
         enemyPath = new JunglePath();
         enemyPath.addWaypoint(width * 1.00f, height * 0.87f);
         enemyPath.addWaypoint(width * 0.82f, height * 0.87f);
@@ -652,6 +688,11 @@ public class JungleMap implements Screen {
     @Override public void resume() {}
     @Override public void hide() {}
 
+    /**
+     * Called when the screen is disposed.
+     * Pre-conditions: None
+     * Post-conditions: All resources are disposed of properly to free up memory.
+     */
     @Override
     public void dispose() {
         if (batch != null) batch.dispose();

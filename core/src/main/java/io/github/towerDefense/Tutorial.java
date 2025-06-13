@@ -29,7 +29,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage; 
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -133,6 +133,11 @@ public class Tutorial implements Screen {
         this.game = game;
     }
 
+    /**
+     * Sets up the game map, initializes variables, and prepares the game state.
+     * Pre: none
+     * Post: the game map is ready to be displayed and interacted with.
+     */
     @Override
     public void show() {
         batch = new SpriteBatch();
@@ -154,6 +159,7 @@ public class Tutorial implements Screen {
         placementManager = new TowerPlacementManager(towers);
         enemyPath = new JunglePath();
 
+        //wave management variables
         waveTimer = TIME_BETWEEN_WAVES;
         waveNumber = 1;
         enemiesPerWave = 1;
@@ -161,11 +167,12 @@ public class Tutorial implements Screen {
         enemySpawnIntervalInWave = 1.0f;
         individualEnemySpawnTimer = 0f;
 
+        //fonts
         font = new BitmapFont();
         glyphLayout = new GlyphLayout();
         font.getData().setScale(2.5f);
 
-        // Load sounds
+        //load sounds
         mainSound = Gdx.audio.newSound(Gdx.files.internal("audio/main.mp3"));
         if (SettingsScreen.musicEnabled) {
             mainID = mainSound.play(0.5f);
@@ -184,6 +191,7 @@ public class Tutorial implements Screen {
         stage = new Stage(new ScreenViewport());
         dragAndDrop = new DragAndDrop();
 
+        //drag and drop setup
         mapDropTargetActor = new Actor();
         mapDropTargetActor.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage.addActor(mapDropTargetActor); 
@@ -282,6 +290,15 @@ public class Tutorial implements Screen {
         leaveButtonTexture = new Texture("leaveButton.png");
         ImageButton leaveButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(leaveButtonTexture)));
         leaveButton.addListener(new ClickListener() {
+            /**
+             * Called when the leave button is clicked.
+             * Pre-conditions: x and y coordinates are valid.
+             * Post-conditions: The main sound stops, button click sound plays, and the game returns to the start screen.
+             * 
+             * @param event
+             * @param x
+             * @param y
+             */
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 mainSound.stop();
@@ -308,6 +325,15 @@ public class Tutorial implements Screen {
         stage.addActor(okButton);
 
         okButton.addListener(new ClickListener() {
+            /**
+             * Called when the OK button is clicked.
+             * Pre-conditions: x and y coordinates are valid.
+             * Post-conditions: Plays the button click sound, updates the tutorial state, or resumes the game if the tutorial is complete.
+             * 
+             * @param event the input event
+             * @param x the x-coordinate of the click
+             * @param y the y-coordinate of the click
+             */
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (SettingsScreen.effectEnabled){
@@ -329,8 +355,12 @@ public class Tutorial implements Screen {
     }
 
     /** 
-     * @param towerTypeString
-     * @return int
+     * Returns the cost of the tower
+     * Pre-condition: towerTypeString must be a valid tower type string.
+     * Post-condition: Returns the cost of the tower as an integer.
+     * 
+     * @param towerTypeString the type of the tower as a string
+     * @return the cost of the tower as an integer
      */
     private int getTowerCost(String towerTypeString) {
         if ("TowerType1".equals(towerTypeString)) return COST_TOWER_1;
@@ -339,10 +369,14 @@ public class Tutorial implements Screen {
         return Integer.MAX_VALUE;
     }
 
-    /** 
-     * @param sourceActor
-     * @param towerType
-     * @param dragActorTexture
+    /**
+     * Adds a drag and drop source for the specified tower type.
+     * Pre-conditions: sourceActor must be a valid Image actor, towerType must be a valid string, and dragActorTexture must not be null.
+     * Post-conditions: The drag and drop source is added to the DragAndDrop system.
+     * 
+     * @param sourceActor the Image actor that will be the source of the drag and drop
+     * @param towerType the type of the tower as a string
+     * @param dragActorTexture the texture for the drag actor
      */
     private void addDragAndDropSource(final Image sourceActor, final String towerType, Texture dragActorTexture) {
         dragAndDrop.addSource(new DragAndDrop.Source(sourceActor) {
@@ -372,8 +406,8 @@ public class Tutorial implements Screen {
         });
     }
 
-    /** 
-     * @param delta
+    /**
+     * main render method that updates the game state and renders the game map.
      */
     @Override
     public void render(float delta) {
@@ -386,6 +420,7 @@ public class Tutorial implements Screen {
         batch.begin();
         batch.draw(backgroundImage, 0, 0, screenWidth, screenHeight);
 
+        //wave text
         String waveText = "WAVE " + waveNumber + "/" + MAX_WAVES;
         glyphLayout.setText(font, waveText);
         float textX = (screenWidth - glyphLayout.width) / 2;
@@ -393,6 +428,7 @@ public class Tutorial implements Screen {
         font.setColor(Color.WHITE);
         font.draw(batch, waveText, textX, textY);
 
+        //coin text
         String coinText = "BenumCoin: " + benumCoin;
         glyphLayout.setText(font, coinText);
         font.setColor(Color.BLACK);
@@ -400,11 +436,13 @@ public class Tutorial implements Screen {
         font.setColor(Color.YELLOW);
         font.draw(batch, coinText, 10, screenHeight - 20);
 
+        //live text
         String livesText = "Lives: " + lives;
         glyphLayout.setText(font, livesText);
         font.setColor(Color.RED);
         font.draw(batch, livesText, 10, screenHeight - 70);
 
+        //tower cost tex6
         font.setColor(Color.GREEN);
         font.getData().setScale(1.5f);
 
@@ -426,6 +464,7 @@ public class Tutorial implements Screen {
 
         ImageButton okButton = (ImageButton) stage.getRoot().findActor("okButton");
 
+        //pause logic
         if (paused) {
             batch.begin();
 
@@ -437,7 +476,7 @@ public class Tutorial implements Screen {
 
             font.getData().setScale(1.5f);
             String tutorialText;
-            switch (tutorialState) {
+            switch (tutorialState) { //instructions for each tutorial state
                 case 0:
                     tutorialText = "Welcome to Rise of Benum Tower Defense!\n\n" +
                                    "Your goal is to prevent enemies from reaching the end of the path.\n" +
@@ -538,6 +577,8 @@ public class Tutorial implements Screen {
             }
 
             batch.begin();
+
+            //tower rendering
             for (Towers tower : towers) {
                 tower.update(delta, enemies, projectiles, batch);
                 tower.renderSprite(batch);
@@ -545,6 +586,8 @@ public class Tutorial implements Screen {
             batch.end();
 
             batch.begin();
+
+            //render projectiles and enemies
             Iterator<Projectile> projectileIterator = projectiles.iterator();
             while (projectileIterator.hasNext()) {
                 Projectile projectile = projectileIterator.next();
@@ -577,8 +620,8 @@ public class Tutorial implements Screen {
             }
             batch.end();
 
+            //wave management
             waveTimer += delta;
-
             if (waveTimer >= TIME_BETWEEN_WAVES) {
                 if (enemiesSpawnedInWave < enemiesPerWave) {
                     individualEnemySpawnTimer += delta;
@@ -590,7 +633,7 @@ public class Tutorial implements Screen {
                             Texture currentEnemyTexture;
                             Sound currentDeathSound;
 
-                            if (waveNumber <= 2) {
+                            if (waveNumber <= 2) { //change enemy properties based on wave number
                                 enemyHealth = 5;
                                 enemySpeed = 100f + waveNumber * 2f;
                                 currentEnemyTexture = enemyTexture1;
@@ -613,7 +656,7 @@ public class Tutorial implements Screen {
                         }
                     }
 
-                } else if (enemies.isEmpty()) {
+                } else if (enemies.isEmpty()) { //if all enemies in the wave are defeated
                     if (waveNumber < MAX_WAVES) {
                         waveNumber++;
                         enemiesPerWave += 2;
@@ -639,7 +682,7 @@ public class Tutorial implements Screen {
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
 
-        if (lives <= 0) {
+        if (lives <= 0) { //lose condition
             if (SettingsScreen.effectEnabled) {
                 gameOverSound.play(1f);
             }
@@ -651,7 +694,10 @@ public class Tutorial implements Screen {
 
     /**
      * Get the current amount of BenumCoin.
-     * @return
+     * Pre-condition: none
+     * Post-condition: Returns the current amount of BenumCoin as an integer.
+     * 
+     * @return the current amount of BenumCoin
      */
     public int getBenumCoin() {
         return benumCoin;
@@ -659,7 +705,10 @@ public class Tutorial implements Screen {
 
     /**
      * Add a specified amount of BenumCoin to the current total.
-     * @param amount
+     * Pre-condition: amount must be a integer
+     * Post-condition: The amount of BenumCoin is increased by the specified amount.
+     * 
+     * @param amount the amount of BenumCoin to add
      */
     public void addBenumCoin(int amount) {
         benumCoin += amount;
@@ -667,7 +716,10 @@ public class Tutorial implements Screen {
 
     /**
      * Spend a specified amount of BenumCoin.
-     * @param amount
+     * Pre-condition: amount must be a integer and less than or equal to the current BenumCoin.
+     * Post-condition: If the amount is less than or equal to the current BenumCoin, it is subtracted from the total and returns true. Otherwise, returns false.
+     * 
+     * @param amount the amount of BenumCoin to spend
      * @return true if the transaction was successful, false otherwise
      */
     public boolean spendBenumCoin(int amount) {
@@ -681,7 +733,8 @@ public class Tutorial implements Screen {
 
     /**
      * Complete the tutorial and save the state to preferences.
-     * This method will write to a local file indicating that the tutorial has been completed.
+     * Pre-condition: none
+     * Post-condition: The tutorial is marked as complete in the preferences file, and the game transitions to the start screen.
      */
     public void completeTutorial() {
         FileHandle tutorialFile = Gdx.files.local("preferences.txt");
@@ -690,9 +743,13 @@ public class Tutorial implements Screen {
         this.dispose(); 
     }
 
-    /** 
-     * @param width
-     * @param height
+    /**
+     * Resizes the game screen and updates the camera and stage viewport.
+     * Pre-condition: width and height are valid integers.
+     * Post-condition: The camera and stage viewport are updated to the new width and height, and the enemy path is recalculated based on the new dimensions.
+     * 
+     * @param width the new width of the game screen
+     * @param height the new height of the game screen
      */
     @Override
     public void resize(int width, int height) {
@@ -703,6 +760,7 @@ public class Tutorial implements Screen {
             mapDropTargetActor.setBounds(0, 0, width, height);
         }
 
+        //path finding
         enemyPath = new JunglePath();
         enemyPath.addWaypoint(width * 1.00f, height * 0.87f);
         enemyPath.addWaypoint(width * 0.82f, height * 0.87f);
@@ -761,6 +819,12 @@ public class Tutorial implements Screen {
     @Override public void resume() {}
     @Override public void hide() {}
 
+
+    /**
+     * Disposes of all resources used by the game.
+     * Pre-condition: None
+     * Post-condition: All textures, sounds, and other resources are disposed of to free up memory.
+     */
     @Override
     public void dispose() {
         if (batch != null) batch.dispose();

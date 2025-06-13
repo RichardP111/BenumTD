@@ -16,12 +16,12 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Towers {
     public float x, y;
-    public static final float SIZE = 100; 
+    public static final float SIZE = 100;  // size of the tower
     private final float attackRange;
     private final float attackDamage;
     private final float attackCooldown;
     private float timeSinceLastAttack; 
-    private static final int COST = 50; 
+    private static final int COST = 50;  
     private final String projectileTextureFileName;
 
     private Enemy currentTarget; 
@@ -31,11 +31,12 @@ public class Towers {
 
     /**
      * Constructor for the Towers class.
+     * 
      * @param x The x-coordinate of the tower.
      * @param y The y-coordinate of the tower.
      * @param attackRange The range within which the tower can attack enemies.
      * @param attackDamage The damage dealt by the tower per attack.
-     * @param attackCooldown The time (in seconds) between attacks.
+     * @param attackCooldown The time between attacks.
      * @param projectileTextureFileName The file name for the projectile texture.
      * @param towerType The file name for the tower image texture.
      */
@@ -58,6 +59,9 @@ public class Towers {
 
     /**
      * Updates the tower's state, including attacking logic.
+     * Precondition: all parameters must be valid
+     * Postcondition: The tower will find a target and shoot projectiles
+     * 
      * @param delta The time elapsed since the last frame.
      * @param enemies The list of active enemies on the map.
      * @param projectiles The list of active projectiles on the map (to add new ones).
@@ -77,8 +81,11 @@ public class Towers {
     }
 
     /**
-     * Renders the tower's sprite. This method will be called within a SpriteBatch.
-     * @param batch The SpriteBatch to draw the tower's sprite.
+     * Renders the tower's sprite using the provided SpriteBatch.
+     * Precondition: The tower's texture must be loaded and the SpriteBatch must be valid.
+     * Postcondition: The tower's sprite is drawn on the screen.
+     * 
+     * @param batch SpriteBatch used for rendering the tower's sprite.
      */
     public void renderSprite(SpriteBatch batch) {
         if (towerSprite != null) {
@@ -87,9 +94,12 @@ public class Towers {
     }
 
     /**
-     * Checks if a given enemy is within the tower's attack range.
-     * @param enemy The enemy to check.
-     * @return true if the enemy is in range, false otherwise.
+     * Checks if the given enemy is within the tower's attack range.
+     * Precondition: The enemy must not be null.
+     * Postcondition: Returns true if the enemy is within range, false otherwise.
+     * 
+     * @param enemy The enemy to check against the tower's attack range.
+     * @return true if the enemy is within range, false otherwise.
      */
     private boolean isInRange(Enemy enemy) {
         if (enemy == null) return false;
@@ -99,8 +109,11 @@ public class Towers {
     }
 
     /**
-     * Finds the nearest active enemy within range and sets it as the current target.
-     * @param enemies The list of active enemies.
+     * Finds a new target from the list of enemies.
+     * Precondition: The enemies list must not be null and should contain at least one enemy.
+     * Postcondition: Sets the currentTarget to the closest enemy within range, or null if no enemies are in range.
+     * 
+     * @param enemies The list of enemies to search for a target.
      */
     private void findNewTarget(ArrayList<Enemy> enemies) {
         currentTarget = null; 
@@ -123,9 +136,12 @@ public class Towers {
     }
 
     /**
-     * Creates and fires a projectile towards the current target.
-     * @param projectiles The list to which the new projectile will be added.
-     * @param batch The SpriteBatch to be passed to the Projectile constructor.
+     * Shoots a projectile towards the current target if it is within range.
+     * Precondition: The projectiles list must not be null and the batch must be valid.
+     * Postcondition: A new Projectile is created and added to the projectiles list if the target is valid.
+     * 
+     * @param projectiles The list of projectiles to which the new projectile will be added.
+     * @param batch SpriteBatch used for rendering the projectile.
      */
     private void shootProjectile(ArrayList<Projectile> projectiles, SpriteBatch batch) { 
         if (currentTarget != null && currentTarget.isAlive() && isInRange(currentTarget)) {
@@ -136,6 +152,9 @@ public class Towers {
 
     /**
      * Gets the center position of the tower.
+     * Precondition: None
+     * Postcondition: Returns a Vector2 representing the center of the tower.
+     * 
      * @return A Vector2 representing the center of the tower.
      */
     public Vector2 getCenter() {
@@ -144,6 +163,8 @@ public class Towers {
 
     /**
      * Gets the attack range of the tower.
+     * Precondition: None
+     * Postcondition: Returns the attack range of the tower.
      * @return The attack range.
      */
     public float getAttackRange() {
@@ -152,6 +173,8 @@ public class Towers {
 
     /**
      * Gets the attack damage of the tower.
+     * Precondition: None
+     * Postcondition: Returns the attack damage of the tower.
      * @return The attack damage.
      */
     public float getAttackDamage() {
@@ -160,6 +183,8 @@ public class Towers {
 
     /**
      * Gets the cost of the tower.
+     * Precondition: None
+     * Postcondition: Returns the cost of the tower.
      * @return The cost.
      */
     public static int getCost() {
@@ -168,6 +193,8 @@ public class Towers {
 
     /**
      * Disposes of the tower's texture when it's no longer needed.
+     * Precondition: None
+     * Postcondition: The towerTexture is disposed of to free up resources.
      */
     public void dispose() {
         if (towerTexture != null) {

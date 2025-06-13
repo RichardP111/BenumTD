@@ -27,14 +27,23 @@ public class SplashScreen implements Screen {
         this.game = game;
     }
 
+    /**
+     * Initializes the splash screen.
+     * Pre-condition: Files must exist
+     * Post-condition: Loadsthe splash image and initializes the sprite batch.
+     */
     @Override
     public void show() {
         batch = new SpriteBatch();
         image = new Texture("benumTowerLogo.png");
     }
 
-    /** 
-     * @param delta
+    /**
+     * Renders the splash screen with a fade-in and fade-out effect.
+     * Pre-condition: Files must exist
+     * Post-condition: Displays the splash screen, fades it in, holds it for a while, and then fades it out.
+     * 
+     * @param delta The time since the last frame in seconds.
      */
     @Override
     public void render(float delta) {
@@ -59,7 +68,7 @@ public class SplashScreen implements Screen {
                 alpha -= delta / 1f; 
                 if (alpha <= 0f) {
                     alpha = 0f;
-                    FileHandle preferences = Gdx.files.local("preferences.txt");
+                    FileHandle preferences = Gdx.files.local("preferences.txt"); //checks if tutorial has been completed
 
                     if (preferences.exists()) {
                         String content = preferences.readString().trim(); 
@@ -102,6 +111,11 @@ public class SplashScreen implements Screen {
     @Override public void resume() {}
     @Override public void hide() {}
 
+    /**
+     * Disposes of the resources used by the splash screen.
+     * Pre-condition: None
+     * Post-condition: Releases the sprite batch and texture resources.
+     */
     @Override
     public void dispose() {
         batch.dispose();

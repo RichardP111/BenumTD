@@ -50,6 +50,12 @@ public class SettingsScreen implements Screen {
         this.game = game;
     }
 
+
+/**
+ * Initializes the settings screen.
+ * Pre-condition: Files must exist
+ * Post-condition: Sets up the UI elements, background, and sound effects.
+ */
 @Override
 public void show() {
     batch = new SpriteBatch();
@@ -68,6 +74,15 @@ public void show() {
 
     TextButton startButton = new TextButton("Back", skin);
     startButton.addListener(new ClickListener() {
+        /**
+         * Handles the click event for the start button.
+         * Pre-condition: x and y coordinates are valid.
+         * Post-condition: Stops the main sound and navigates back to the start screen.
+         * 
+         * @param event the input event
+         * @param x the x-coordinate of the click
+         * @param y the y-coordinate of the click
+         */
         @Override
         public void clicked(InputEvent event, float x, float y) {
             if (effectEnabled){
@@ -92,6 +107,16 @@ public void show() {
 
     effectButton = new ImageButton(effectEnabled ? effectOnDrawable : effectOffDrawable);
     effectButton.addListener(new ClickListener() {
+
+        /**
+         * Handles the click event for the effects button.
+         * Pre-condition: x and y coordinates are valid.
+         * Post-condition: Toggles the effect state and updates the button appearance.
+         * 
+         * @param event the input event
+         * @param x the x-coordinate of the click
+         * @param y the y-coordinate of the click
+         */
         @Override
         public void clicked(InputEvent event, float x, float y) {
             effectEnabled = !effectEnabled;
@@ -140,8 +165,10 @@ public void show() {
     stage.addActor(settingsTable);
 }
 
-    /** 
-     * @param delta
+    /**
+     * Renders the settings screen.
+     * Pre-condition: None
+     * Post-condition: Draws the background and UI elements on the screen.
      */
     @Override
     public void render(float delta) {
@@ -156,6 +183,11 @@ public void show() {
         stage.draw();
     }
 
+    /**
+     * Disposes of the resources used by the settings screen.
+     * Pre-condition: None
+     * Post-condition: Releases all textures, sounds, and stage resources.
+     */
     @Override
     public void dispose() {
         batch.dispose();
@@ -169,6 +201,12 @@ public void show() {
         skin.dispose();
         mainSound.dispose();
     }
+
+    /**
+     * Resizes the viewport of the stage.
+     * Pre-condition: Width and height must be valid integers.
+     * Post-condition: Updates the viewport of the stage to match the new width and height.
+     */
 
     @Override public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
