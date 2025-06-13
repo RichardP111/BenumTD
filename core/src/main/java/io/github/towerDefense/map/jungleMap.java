@@ -155,7 +155,7 @@ public class JungleMap implements Screen {
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         benumCoin = 100; //starting coin
-        lives = 3; //starting live
+        lives = 3; //starting lives
 
         placementManager = new TowerPlacementManager(towers);
         enemyPath = new JunglePath();
@@ -494,17 +494,16 @@ public class JungleMap implements Screen {
             enemy.move(delta);
             enemy.render(batch);
 
-            if (!enemy.isAlive() || enemy.hasReachedEnd()) {
-                if (enemy.hasReachedEnd()) {
-                    lives--;
-                } else if (!enemy.isAlive()) {
-                    addBenumCoin(5);
-                    if (SettingsScreen.effectEnabled){
-                        enemy.playDeathSound(); 
-                    }
-                    enemyIterator.remove();
+            if (enemy.hasReachedEnd()) { 
+                lives--;
+                enemyIterator.remove();
+            } else if (!enemy.isAlive()) { 
+                addBenumCoin(5);
+                if (SettingsScreen.effectEnabled){
+                    enemy.playDeathSound(); 
                 }
-            }
+                enemyIterator.remove();
+            } 
         }
         batch.end();
 
